@@ -66,7 +66,7 @@ export default function ScrollAnimations() {
       // --- On-mount entrance (above the fold, not scroll-tied) ---
       const heroBg = document.querySelector('[data-anim="hero-bg"]');
       if (heroBg) {
-        gsap.fromTo(heroBg, { scale: 1.06 }, { scale: 1, duration: 1.6, ease: "power2.out" });
+        gsap.fromTo(heroBg, { scale: 1.04 }, { scale: 1, duration: 1.2, ease: "power2.out", clearProps: "transform" });
       }
 
       const headerItems = document.querySelectorAll('[data-anim="header-item"]');

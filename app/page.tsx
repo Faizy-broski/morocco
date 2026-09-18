@@ -11,7 +11,7 @@ export default function Home() {
       {/* Background Hero Image */}
       <div data-anim="hero-bg" className="absolute top-0 left-0 right-0 h-[850px] z-0 overflow-hidden">
         <Image
-          src="/images/hero.svg"
+          src="/images/hero.webp"
           alt="Hero Background"
           fill
           className="object-cover object-top opacity-90"
