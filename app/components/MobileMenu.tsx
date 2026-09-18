@@ -54,7 +54,7 @@ export default function MobileMenu({ active }: { active: string }) {
         }`}
       >
         <div className="flex items-center justify-between px-6 pt-7 pb-5 border-b border-gray-100">
-          <Image src="/images/header-logo-transparent.png" alt="Morocco Visa Service" width={150} height={53} />
+          <Image src="/images/header-logo-transparent.webp" alt="Morocco Visa Service" width={150} height={53} />
           <button
             type="button"
             onClick={() => setOpen(false)}

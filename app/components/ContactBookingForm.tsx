@@ -80,7 +80,7 @@ export default function ContactBookingForm() {
 
       {/* Background watermark */}
       <div className="absolute -right-20 -bottom-20 w-[300px] h-[300px] opacity-[0.02] pointer-events-none">
-        <Image src="/images/plane.svg" alt="" fill className="object-contain" />
+        <Image src="/images/plane.webp" alt="" fill className="object-contain" />
       </div>
 
       <form onSubmit={handleSubmit} className="relative z-10 flex flex-col gap-5">

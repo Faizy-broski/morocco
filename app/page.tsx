@@ -24,7 +24,7 @@ export default function Home() {
         {/* Logo */}
         <div data-anim="header-item" className="flex-shrink-0">
           <a href="/">
-            <Image src="/images/header-logo-transparent.png" alt="Morocco Visa Service" width={220} height={78} priority />
+            <Image src="/images/header-logo-transparent.webp" alt="Morocco Visa Service" width={220} height={78} priority />
           </a>
         </div>
         {/* Navigation Pill */}
@@ -113,8 +113,8 @@ export default function Home() {
       {/* Destinations Section */}
       <section data-anim-section="destinations" className="relative w-full bg-white pt-24 pb-32 px-6 md:px-12 overflow-hidden shadow-[0_-20px_40px_rgba(0,0,0,0.015)] mt-[-20px]">
         {/* Background Flags */}
-        <div data-anim="parallax-bg" data-parallax-speed="0.6" className="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-[1600px] h-[800px] z-0 flex items-start justify-center pt-0 pointer-events-none opacity-60">
-          <Image src="/images/flags.svg" alt="" fill className="object-contain object-top" />
+        <div data-anim="parallax-bg" data-parallax-speed="0.6" className="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-[1600px] h-[800px] z-0 flex items-start justify-center pt-0 pointer-events-none opacity-[0.05]">
+          <Image src="/images/flags.webp" alt="" fill className="object-contain object-top" />
         </div>
 
         <div className="relative z-10 max-w-[1200px] mx-auto">
@@ -135,7 +135,7 @@ export default function Home() {
           {/* Mobile Image Stack (Hidden on Desktop) */}
           <div className="flex lg:hidden flex-col gap-6 mt-12 relative z-20">
             <div data-anim="clip-wipe-up" className="relative w-full h-[400px] rounded-tr-[4rem] overflow-hidden shadow-md">
-              <Image src="/images/Marrakech architecture.svg" alt="Marrakech" fill className="object-cover" />
+              <Image src="/images/Marrakech architecture.webp" alt="Marrakech" fill className="object-cover" />
               <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent"></div>
               <div className="absolute bottom-8 left-8 text-white">
                 <h3 className="font-playfair text-[32px] mb-1 tracking-wide">MARRAKECH</h3>
@@ -144,7 +144,7 @@ export default function Home() {
             </div>
             
             <div data-anim="clip-wipe-up" className="relative w-full h-[350px] rounded-tl-[4rem] overflow-hidden shadow-md">
-              <Image src="/images/Moroccan destination.svg" alt="Chefchaouen" fill className="object-cover" />
+              <Image src="/images/Moroccan destination.webp" alt="Chefchaouen" fill className="object-cover" />
               <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent"></div>
               <div className="absolute bottom-8 left-8 text-white">
                 <h3 className="font-playfair text-[28px] mb-1 tracking-wide">CHEFCHAOUEN</h3>
@@ -153,7 +153,7 @@ export default function Home() {
             </div>
             
             <div data-anim="clip-wipe-up" className="relative w-full h-[250px] rounded-tl-[3rem] rounded-br-[3rem] overflow-hidden shadow-xl border-4 border-white">
-              <Image src="/images/Sahara dunes.svg" alt="Sahara" fill className="object-cover" />
+              <Image src="/images/Sahara dunes.webp" alt="Sahara" fill className="object-cover" />
               <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent"></div>
               <div className="absolute bottom-6 left-8 text-white">
                 <h3 className="font-playfair text-[28px] mb-1 tracking-wide">SAHARA</h3>
@@ -174,7 +174,7 @@ export default function Home() {
           <div className="hidden lg:block relative w-full h-[680px] mt-20 mb-10 z-20">
             {/* Marrakech (Left) */}
             <div data-anim="fade-up" className="absolute top-0 left-0 w-[45%] h-[520px] rounded-tr-[5rem] overflow-hidden z-10 group cursor-pointer shadow-md">
-              <Image src="/images/Marrakech architecture.svg" alt="Marrakech" fill className="object-cover transition duration-700 group-hover:scale-105" />
+              <Image src="/images/Marrakech architecture.webp" alt="Marrakech" fill className="object-cover transition duration-700 group-hover:scale-105" />
               <div className="absolute inset-0 bg-gradient-to-t from-[#111111]/80 via-transparent to-transparent"></div>
               <div className="absolute bottom-10 left-10 text-white">
                 <h3 className="font-playfair text-[38px] mb-1 tracking-wide">MARRAKECH</h3>
@@ -184,7 +184,7 @@ export default function Home() {
 
             {/* Chefchaouen (Right) */}
             <div data-anim="fade-up" data-anim-delay="0.2" className="absolute top-0 right-0 w-[42%] h-[440px] rounded-tl-[5rem] overflow-hidden z-10 group cursor-pointer shadow-md">
-              <Image src="/images/Moroccan destination.svg" alt="Chefchaouen" fill className="object-cover transition duration-700 group-hover:scale-105" />
+              <Image src="/images/Moroccan destination.webp" alt="Chefchaouen" fill className="object-cover transition duration-700 group-hover:scale-105" />
               <div className="absolute inset-0 bg-gradient-to-t from-[#111111]/80 via-transparent to-transparent"></div>
               <div className="absolute bottom-10 left-10 text-white">
                 <h3 className="font-playfair text-[32px] mb-1 tracking-wide">CHEFCHAOUEN</h3>
@@ -194,7 +194,7 @@ export default function Home() {
 
             {/* Sahara (Center Overlay) */}
             <div data-anim="scale-in" data-anim-delay="0.4" className="absolute bottom-0 right-[28%] w-[42%] h-[280px] rounded-tl-[4rem] rounded-br-[4rem] overflow-hidden z-20 group cursor-pointer shadow-2xl border-[6px] border-white">
-              <Image src="/images/Sahara dunes.svg" alt="Sahara" fill className="object-cover transition duration-700 group-hover:scale-105" />
+              <Image src="/images/Sahara dunes.webp" alt="Sahara" fill className="object-cover transition duration-700 group-hover:scale-105" />
               <div className="absolute inset-0 bg-gradient-to-t from-[#111111]/90 via-transparent to-transparent"></div>
               <div className="absolute bottom-8 left-10 text-white">
                 <h3 className="font-playfair text-[30px] mb-1 tracking-wide">SAHARA</h3>
@@ -248,7 +248,7 @@ export default function Home() {
                 </div>
                 {/* Image Pill that Extends on Hover */}
                 <div className="relative w-full md:w-[450px] group-hover:md:w-[600px] h-[110px] group-hover:h-[130px] rounded-full group-hover:rounded-3xl overflow-hidden flex-shrink-0 transition-all duration-700 ease-[cubic-bezier(0.25,1,0.5,1)] shadow-sm group-hover:shadow-2xl">
-                  <Image src="/images/Moroccan destination.svg" alt="Tourist Visa" fill className="object-cover transition duration-1000 group-hover:scale-110" />
+                  <Image src="/images/Moroccan destination.webp" alt="Tourist Visa" fill className="object-cover transition duration-1000 group-hover:scale-110" />
                   <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors duration-700"></div>
                 </div>
               </div>
@@ -275,7 +275,7 @@ export default function Home() {
                   </a>
                 </div>
                 <div className="relative w-full md:w-[450px] group-hover:md:w-[600px] h-[110px] group-hover:h-[130px] rounded-full group-hover:rounded-3xl overflow-hidden flex-shrink-0 transition-all duration-700 ease-[cubic-bezier(0.25,1,0.5,1)] shadow-sm group-hover:shadow-2xl">
-                  <Image src="/images/Moroccan destination (1).svg" alt="Business Visa" fill className="object-cover transition duration-1000 group-hover:scale-110" />
+                  <Image src="/images/Moroccan destination (1).webp" alt="Business Visa" fill className="object-cover transition duration-1000 group-hover:scale-110" />
                   <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors duration-700"></div>
                 </div>
               </div>
@@ -302,7 +302,7 @@ export default function Home() {
                   </a>
                 </div>
                 <div className="relative w-full md:w-[450px] group-hover:md:w-[600px] h-[110px] group-hover:h-[130px] rounded-full group-hover:rounded-3xl overflow-hidden flex-shrink-0 transition-all duration-700 ease-[cubic-bezier(0.25,1,0.5,1)] shadow-sm group-hover:shadow-2xl">
-                  <Image src="/images/Moroccan destination (2).svg" alt="Visit Visa" fill className="object-cover transition duration-1000 group-hover:scale-110" />
+                  <Image src="/images/Moroccan destination (2).webp" alt="Visit Visa" fill className="object-cover transition duration-1000 group-hover:scale-110" />
                   <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors duration-700"></div>
                 </div>
               </div>
@@ -329,7 +329,7 @@ export default function Home() {
                   </a>
                 </div>
                 <div className="relative w-full md:w-[450px] group-hover:md:w-[600px] h-[110px] group-hover:h-[130px] rounded-full group-hover:rounded-3xl overflow-hidden flex-shrink-0 transition-all duration-700 ease-[cubic-bezier(0.25,1,0.5,1)] shadow-sm group-hover:shadow-2xl">
-                  <Image src="/images/Blue streets of Chefchaouen.svg" alt="Transit Visa" fill className="object-cover transition duration-1000 group-hover:scale-110" />
+                  <Image src="/images/Blue streets of Chefchaouen.webp" alt="Transit Visa" fill className="object-cover transition duration-1000 group-hover:scale-110" />
                   <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors duration-700"></div>
                 </div>
               </div>
@@ -344,8 +344,8 @@ export default function Home() {
       {/* Why Choose Us Section */}
       <section data-anim-section="why-choose" className="relative w-full bg-white pt-32 pb-40 px-6 md:px-12 overflow-hidden">
         {/* Background Plane & Clouds */}
-        <div data-anim="parallax-bg" data-parallax-speed="0.6" className="absolute inset-0 z-0 flex items-center justify-center pointer-events-none">
-          <Image src="/images/plane.svg" alt="Plane Background" fill className="object-cover object-center opacity-100" />
+        <div data-anim="parallax-bg" data-parallax-speed="0.6" className="absolute inset-0 z-0 flex items-center justify-center pointer-events-none opacity-[0.12]">
+          <Image src="/images/plane.webp" alt="Plane Background" fill className="object-cover object-center" />
         </div>
 
         <div className="relative z-10 max-w-[1200px] mx-auto grid grid-cols-1 lg:grid-cols-2 gap-16 lg:gap-24 items-center">
@@ -355,7 +355,7 @@ export default function Home() {
             {/* Main Image */}
             <div data-anim="scale-in" className="relative w-full h-[450px] md:h-[680px] rounded-tl-[6rem] md:rounded-tl-[8rem] rounded-tr-xl rounded-br-xl rounded-bl-xl overflow-hidden shadow-2xl border-4 border-white">
               <Image
-                src="/images/Detailed arches in a peaceful Moroccan riad.svg"
+                src="/images/Detailed arches in a peaceful Moroccan riad.webp"
                 alt="Moroccan Riad"
                 fill
                 className="object-cover"
@@ -465,7 +465,7 @@ export default function Home() {
 
         {/* Faded Background Pattern (Palm trees and Riad) */}
         <div className="absolute inset-0 z-0 opacity-10 pointer-events-none mix-blend-overlay">
-          <Image src="/images/Detailed arches in a peaceful Moroccan riad.svg" alt="Moroccan pattern" fill className="object-cover" />
+          <Image src="/images/Detailed arches in a peaceful Moroccan riad.webp" alt="Moroccan pattern" fill className="object-cover" />
         </div>
 
 
@@ -532,8 +532,8 @@ export default function Home() {
       {/* From Application to Arrival Section (Animated) */}
       <section data-anim-section="arrival" className="relative w-full bg-white pt-24 pb-32 px-6 md:px-12 overflow-hidden">
         {/* Background Plane (Faded silhouette, spans the full section) */}
-        <div className="absolute inset-0 z-0 pointer-events-none">
-          <Image src="/images/raw-plane.svg" alt="" fill className="object-cover object-top" />
+        <div className="absolute inset-0 z-0 pointer-events-none opacity-[0.10]">
+          <Image src="/images/raw-plane.webp" alt="" fill className="object-cover object-top" />
         </div>
 
         <div className="relative z-10 max-w-[1200px] mx-auto">
@@ -645,7 +645,7 @@ export default function Home() {
               data-anim="clip-wipe-left"
               className="font-playfair font-bold text-[56px] min-[400px]:text-[72px] sm:text-[110px] md:text-[180px] lg:text-[260px] xl:text-[320px] leading-[0.8] tracking-tighter uppercase w-full text-center"
               style={{
-                backgroundImage: "url('/images/morocco.jpg')",
+                backgroundImage: "url('/images/morocco.webp')",
                 backgroundSize: "cover",
                 backgroundPosition: "center",
                 WebkitBackgroundClip: "text",
@@ -681,7 +681,7 @@ export default function Home() {
 
             {/* Center Image */}
             <div data-anim="fade-up" data-anim-delay="0.15" className="w-full lg:w-1/3 flex justify-center relative h-[250px] md:h-[350px]">
-              <Image src="/images/files.svg" alt="Documents" fill className="object-contain drop-shadow-2xl" />
+              <Image src="/images/files.webp" alt="Documents" fill className="object-contain drop-shadow-2xl" />
             </div>
 
             {/* Right List */}
@@ -797,8 +797,8 @@ export default function Home() {
           {/* Left Column (Heading & Flag) */}
           <div className="w-full md:w-[45%] relative">
             {/* Background Flag */}
-            <div data-anim="parallax-bg" data-parallax-speed="0.6" className="absolute -top-24 -left-[20%] md:-left-[50%] lg:-left-[30%] w-[800px] h-[700px] z-0 pointer-events-none opacity-90">
-              <Image src="/images/flag.svg" alt="Flag" fill className="object-contain object-left" />
+            <div data-anim="parallax-bg" data-parallax-speed="0.6" className="absolute -top-24 -left-[20%] md:-left-[50%] lg:-left-[30%] w-[800px] h-[700px] z-0 pointer-events-none opacity-[0.07]">
+              <Image src="/images/flag.webp" alt="Flag" fill className="object-contain object-left" />
             </div>
 
             <div className="relative z-10 pt-4">
@@ -821,7 +821,7 @@ export default function Home() {
         <footer data-anim-section="footer" className="relative w-full rounded-t-[4rem] md:rounded-t-[6rem] overflow-hidden text-white mt-0">
           {/* Background Image */}
           <div className="absolute inset-0 z-0">
-            <Image src="/images/footer-bg.png" alt="Morocco from airplane" fill className="object-cover" />
+            <Image src="/images/footer-bg.webp" alt="Morocco from airplane" fill className="object-cover" />
             {/* Subtle dark gradient overlay to ensure text contrast at bottom */}
             <div className="absolute inset-0 bg-gradient-to-t from-black/95 via-black/40 to-transparent"></div>
           </div>
@@ -851,7 +851,7 @@ export default function Home() {
             {/* Logo and Description */}
             <div data-anim="card" className="col-span-1 md:col-span-5 flex flex-col">
               <div className="relative h-[80px] w-[260px] mb-6">
-                <Image src="/images/footer-logo.svg" alt="Morocco Visa Service" fill className="object-contain object-left" />
+                <Image src="/images/footer-logo.webp" alt="Morocco Visa Service" fill className="object-contain object-left" />
               </div>
               <p className="text-white/70 text-[14px] leading-relaxed max-w-[320px]">
                 Professional Morocco visa assistance for UK travellers. Clear guidance, careful document support and responsive communication.

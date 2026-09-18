@@ -11,7 +11,7 @@ export default function HowItWorksPage() {
       <header data-anim-section="header" className="relative z-20 w-full pt-8 pb-4 px-6 md:px-12 flex items-center justify-between mx-auto max-w-[1400px]">
         <div className="flex-shrink-0">
           <a href="/">
-            <Image src="/images/header-logo-transparent.png" alt="Morocco Visa Service" width={220} height={78} priority />
+            <Image src="/images/header-logo-transparent.webp" alt="Morocco Visa Service" width={220} height={78} priority />
           </a>
         </div>
         
@@ -38,7 +38,7 @@ export default function HowItWorksPage() {
       <div className="hidden lg:flex sticky top-0 h-screen w-full items-center justify-center overflow-hidden z-0">
         {/* Light subtle background */}
         <div className="absolute inset-0 opacity-40">
-          <Image src="/images/Sahara dunes.svg" alt="Background" fill className="object-cover grayscale mix-blend-multiply" />
+          <Image src="/images/Sahara dunes.webp" alt="Background" fill className="object-cover grayscale mix-blend-multiply" />
         </div>
         
         {/* Moroccan Arch Portal */}
@@ -47,7 +47,7 @@ export default function HowItWorksPage() {
           style={{ borderRadius: '250px 250px 0 0' }}
         >
           <Image 
-            src="/images/Detailed arches in a peaceful Moroccan riad.svg" 
+            src="/images/Detailed arches in a peaceful Moroccan riad.webp" 
             alt="Portal" 
             fill 
             className="object-cover"
@@ -75,7 +75,7 @@ export default function HowItWorksPage() {
               style={{ borderRadius: '140px 140px 0 0' }}
             >
               <Image 
-                src="/images/Detailed arches in a peaceful Moroccan riad.svg" 
+                src="/images/Detailed arches in a peaceful Moroccan riad.webp" 
                 alt="Portal" 
                 fill 
                 className="object-cover"
@@ -151,7 +151,7 @@ export default function HowItWorksPage() {
       <footer data-anim-section="footer" className="relative w-full rounded-t-[4rem] md:rounded-t-[6rem] overflow-hidden text-white mt-0">
         {/* Background Image */}
         <div className="absolute inset-0 z-0">
-          <Image src="/images/footer-bg.png" alt="Morocco from airplane" fill className="object-cover" />
+          <Image src="/images/footer-bg.webp" alt="Morocco from airplane" fill className="object-cover" />
           {/* Subtle dark gradient overlay to ensure text contrast */}
           <div className="absolute inset-0 bg-gradient-to-t from-black/95 via-black/40 to-transparent"></div>
         </div>
@@ -180,7 +180,7 @@ export default function HowItWorksPage() {
             {/* Logo and Description */}
             <div data-anim="card" className="col-span-1 md:col-span-5 flex flex-col">
               <div className="relative h-[80px] w-[260px] mb-6">
-                <Image src="/images/footer-logo.svg" alt="Morocco Visa Service" fill className="object-contain object-left" />
+                <Image src="/images/footer-logo.webp" alt="Morocco Visa Service" fill className="object-contain object-left" />
               </div>
               <p className="text-white/70 text-[14px] leading-relaxed max-w-[320px]">
                 Professional Morocco visa assistance for UK travellers. Clear guidance, careful document support and responsive communication.

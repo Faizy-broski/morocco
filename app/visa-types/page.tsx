@@ -8,7 +8,7 @@ export default function VisaTypesPage() {
       id: "01",
       title: "Tourist Visa",
       desc: "Experience the vibrant souks, majestic mountains, and golden dunes. Perfect for explorers, holidaymakers, and those seeking the magic of Morocco.",
-      image: "/images/Blue streets of Chefchaouen.svg",
+      image: "/images/Blue streets of Chefchaouen.webp",
       color: "bg-white", // Deep Blue
       textColor: "text-gray-900"
     },
@@ -16,7 +16,7 @@ export default function VisaTypesPage() {
       id: "02",
       title: "Business Visa",
       desc: "Fast-track processing for corporate travelers. Attend conferences, meetings, and explore investment opportunities with zero friction.",
-      image: "/images/Marrakech architecture.svg",
+      image: "/images/Marrakech architecture.webp",
       color: "bg-[#F9F9F7]", // Dark Red
       textColor: "text-gray-900"
     },
@@ -24,7 +24,7 @@ export default function VisaTypesPage() {
       id: "03",
       title: "Student Visa",
       desc: "Embark on an educational journey in one of North Africa's most culturally rich nations. We streamline your study documentation.",
-      image: "/images/Moroccan destination (1).svg",
+      image: "/images/Moroccan destination (1).webp",
       color: "bg-[#F9F9F7]", // Cream
       textColor: "text-gray-900"
     },
@@ -32,7 +32,7 @@ export default function VisaTypesPage() {
       id: "04",
       title: "Transit Visa",
       desc: "Passing through? Ensure a seamless layover experience with our rapid transit visa service.",
-      image: "/images/Blue streets of Chefchaouen.svg",
+      image: "/images/Blue streets of Chefchaouen.webp",
       color: "bg-[#F2F2F0]", // Black
       textColor: "text-gray-900"
     }
@@ -47,7 +47,7 @@ export default function VisaTypesPage() {
         <header data-anim-section="header" className="relative w-full pt-8 pb-4 px-6 md:px-12 flex items-center justify-between mx-auto max-w-[1400px]">
           <div data-anim="header-item" className="flex-shrink-0">
             <a href="/">
-              <Image src="/images/header-logo-transparent.png" alt="Morocco Visa Service" width={220} height={78} priority />
+              <Image src="/images/header-logo-transparent.webp" alt="Morocco Visa Service" width={220} height={78} priority />
             </a>
           </div>
           
@@ -128,7 +128,7 @@ export default function VisaTypesPage() {
           <div className="grid grid-cols-1 md:grid-cols-12 gap-12 lg:gap-8 mb-20">
             <div data-anim="card" className="col-span-1 md:col-span-4 flex flex-col gap-6">
               <a href="/">
-                <Image src="/images/footer-logo.svg" alt="Morocco Visa Service" width={200} height={60} />
+                <Image src="/images/footer-logo.webp" alt="Morocco Visa Service" width={200} height={60} />
               </a>
               <p className="text-white/60 text-[14px] leading-relaxed max-w-sm mt-4">
                 We simplify the visa process, turning complex requirements into a seamless journey to the heart of North Africa.

@@ -8,7 +8,7 @@ export default function AboutPage() {
       {/* Background Hero Image */}
       <div data-anim="hero-bg" className="absolute top-0 left-0 right-0 h-[650px] z-0 overflow-hidden">
         <Image
-          src="/images/Detailed arches in a peaceful Moroccan riad.svg"
+          src="/images/Detailed arches in a peaceful Moroccan riad.webp"
           alt="Moroccan Riad"
           fill
           className="object-cover object-center opacity-80"
@@ -22,7 +22,7 @@ export default function AboutPage() {
         {/* Logo */}
         <div data-anim="header-item" className="flex-shrink-0">
           <a href="/">
-            <Image src="/images/header-logo-transparent.png" alt="Morocco Visa Service" width={220} height={78} priority />
+            <Image src="/images/header-logo-transparent.webp" alt="Morocco Visa Service" width={220} height={78} priority />
           </a>
         </div>
         {/* Navigation Pill */}
@@ -76,7 +76,7 @@ export default function AboutPage() {
             </p>
           </div>
           <div data-anim="clip-wipe-up" className="relative h-[500px] w-full rounded-[2rem] overflow-hidden shadow-2xl">
-            <Image src="/images/Blue streets of Chefchaouen.svg" alt="Chefchaouen" fill className="object-cover" />
+            <Image src="/images/Blue streets of Chefchaouen.webp" alt="Chefchaouen" fill className="object-cover" />
           </div>
         </div>
       </section>
@@ -135,7 +135,7 @@ export default function AboutPage() {
       {/* Our Visa Services Section */}
       <section className="relative w-full bg-white py-24 px-6 md:px-12 overflow-hidden">
         <div className="absolute top-0 right-0 w-[500px] h-[500px] opacity-[0.03] pointer-events-none">
-          <Image src="/images/plane.svg" alt="" fill className="object-contain" />
+          <Image src="/images/plane.webp" alt="" fill className="object-contain" />
         </div>
         <div className="max-w-[1200px] mx-auto grid grid-cols-1 lg:grid-cols-12 gap-16 items-center relative z-10">
           <div className="lg:col-span-5 flex flex-col">
@@ -172,10 +172,10 @@ export default function AboutPage() {
           </div>
           <div className="lg:col-span-7 grid grid-cols-2 gap-4">
             <div data-anim="slide-card" data-slide-x="40" className="relative h-[300px] md:h-[400px] rounded-[2rem] overflow-hidden mt-8">
-              <Image src="/images/Moroccan destination.svg" alt="Service 1" fill className="object-cover" />
+              <Image src="/images/Moroccan destination.webp" alt="Service 1" fill className="object-cover" />
             </div>
             <div data-anim="slide-card" data-slide-x="40" className="relative h-[300px] md:h-[400px] rounded-[2rem] overflow-hidden">
-              <Image src="/images/Moroccan destination (1).svg" alt="Service 2" fill className="object-cover" />
+              <Image src="/images/Moroccan destination (1).webp" alt="Service 2" fill className="object-cover" />
             </div>
           </div>
         </div>
@@ -185,7 +185,7 @@ export default function AboutPage() {
       <div className="w-full bg-white">
         <footer data-anim-section="footer" className="relative w-full rounded-t-[4rem] md:rounded-t-[6rem] overflow-hidden text-white mt-0">
         <div className="absolute inset-0 z-0">
-          <Image src="/images/footer-bg.png" alt="Morocco from airplane" fill className="object-cover" />
+          <Image src="/images/footer-bg.webp" alt="Morocco from airplane" fill className="object-cover" />
           <div className="absolute inset-0 bg-gradient-to-t from-black/95 via-black/40 to-transparent"></div>
         </div>
 
@@ -212,7 +212,7 @@ export default function AboutPage() {
             {/* Logo and Description */}
             <div data-anim="card" className="col-span-1 md:col-span-5 flex flex-col">
               <div className="relative h-[80px] w-[260px] mb-6">
-                <Image src="/images/footer-logo.svg" alt="Morocco Visa Service" fill className="object-contain object-left" />
+                <Image src="/images/footer-logo.webp" alt="Morocco Visa Service" fill className="object-contain object-left" />
               </div>
               <p className="text-white/70 text-[14px] leading-relaxed max-w-[320px]">
                 Professional Morocco visa assistance for UK travellers. Clear guidance, careful document support and responsive communication.

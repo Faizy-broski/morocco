@@ -12,7 +12,7 @@ export default function ContactPage() {
         {/* Mobile Header (Hidden on LG) */}
         <header className="lg:hidden w-full pt-8 pb-4 px-6 flex items-center justify-between z-50 bg-[#F9F9F7] sticky top-0 border-b border-gray-100">
           <a href="/">
-            <Image src="/images/header-logo-transparent.png" alt="Morocco Visa Service" width={160} height={57} priority />
+            <Image src="/images/header-logo-transparent.webp" alt="Morocco Visa Service" width={160} height={57} priority />
           </a>
           <MobileMenu active="/contact" />
         </header>
@@ -21,7 +21,7 @@ export default function ContactPage() {
         <div className="lg:w-5/12 relative overflow-hidden text-white rounded-b-[3rem] lg:rounded-b-none lg:rounded-r-[3rem] shadow-2xl min-h-[60vh] lg:min-h-0">
           {/* Background Image with Dark Red Overlay (covers the full stretched height) */}
           <div className="absolute inset-0 z-0">
-            <Image src="/images/Detailed arches in a peaceful Moroccan riad.svg" alt="Riad" fill className="object-cover" />
+            <Image src="/images/Detailed arches in a peaceful Moroccan riad.webp" alt="Riad" fill className="object-cover" />
             <div className="absolute inset-0 bg-[#5E1A1A]/90 mix-blend-multiply"></div>
             <div className="absolute inset-0 bg-gradient-to-b from-black/40 via-transparent to-black/60"></div>
           </div>
@@ -31,7 +31,7 @@ export default function ContactPage() {
             {/* Top: Logo (Desktop only) */}
             <div className="hidden lg:block" data-anim="fade-up">
               <a href="/">
-                <Image src="/images/footer-logo.svg" alt="Logo" width={200} height={60} />
+                <Image src="/images/footer-logo.webp" alt="Logo" width={200} height={60} />
               </a>
             </div>
 
@@ -145,7 +145,7 @@ export default function ContactPage() {
       {/* Footer */}
       <footer data-anim-section="footer" className="relative w-full overflow-hidden text-white mt-0 z-30 rounded-t-[4rem] md:rounded-t-[6rem]">
         <div className="absolute inset-0 z-0">
-          <Image src="/images/footer-bg.png" alt="Morocco from airplane" fill className="object-cover" />
+          <Image src="/images/footer-bg.webp" alt="Morocco from airplane" fill className="object-cover" />
           <div className="absolute inset-0 bg-gradient-to-t from-black/95 via-black/40 to-transparent"></div>
         </div>
 
@@ -153,7 +153,7 @@ export default function ContactPage() {
           <div data-anim-group="footer-columns" className="grid grid-cols-1 md:grid-cols-12 gap-12 mb-16">
             <div data-anim="card" className="col-span-1 md:col-span-5 flex flex-col">
               <div className="relative h-[80px] w-[260px] mb-6">
-                <Image src="/images/footer-logo.svg" alt="Morocco Visa Service" fill className="object-contain object-left" />
+                <Image src="/images/footer-logo.webp" alt="Morocco Visa Service" fill className="object-contain object-left" />
               </div>
               <p className="text-white/70 text-[14px] leading-relaxed max-w-[320px]">
                 Professional Morocco visa assistance for UK travellers. Clear guidance, careful document support and responsive communication.

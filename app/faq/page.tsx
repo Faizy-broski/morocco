@@ -48,7 +48,7 @@ export default function FAQPage() {
       <header data-anim-section="header" className="relative z-50 w-full pt-8 pb-4 px-6 md:px-12 flex items-center justify-between mx-auto max-w-[1400px]">
         <div data-anim="header-item" className="flex-shrink-0">
           <a href="/">
-            <Image src="/images/header-logo-transparent.png" alt="Morocco Visa Service" width={220} height={78} priority />
+            <Image src="/images/header-logo-transparent.webp" alt="Morocco Visa Service" width={220} height={78} priority />
           </a>
         </div>
         {/* Navigation Pill */}
@@ -80,7 +80,7 @@ export default function FAQPage() {
       <main className="relative z-10 w-full pt-20 pb-20 px-6 md:px-12 overflow-hidden flex flex-col items-center justify-center min-h-[45vh]">
         {/* Giant Watermark Background */}
         <div data-anim="parallax-bg" data-parallax-speed="0.3" className="absolute top-10 left-1/2 -translate-x-1/2 w-[600px] h-[600px] md:w-[900px] md:h-[900px] opacity-[0.02] pointer-events-none mix-blend-multiply">
-          <Image src="/images/flag.svg" alt="" fill className="object-contain" />
+          <Image src="/images/flag.webp" alt="" fill className="object-contain" />
         </div>
         
         <p data-anim="fade-up" className="text-[#E76C53] text-[10px] md:text-[12px] font-bold tracking-[0.3em] uppercase mb-8 z-10">Knowledge Base</p>
@@ -198,7 +198,7 @@ export default function FAQPage() {
       {/* Footer */}
       <footer data-anim-section="footer" className="relative w-full rounded-t-[4rem] md:rounded-t-[6rem] overflow-hidden text-white mt-0">
         <div className="absolute inset-0 z-0">
-          <Image src="/images/footer-bg.png" alt="Morocco from airplane" fill className="object-cover" />
+          <Image src="/images/footer-bg.webp" alt="Morocco from airplane" fill className="object-cover" />
           <div className="absolute inset-0 bg-gradient-to-t from-black/95 via-black/40 to-transparent"></div>
         </div>
 
@@ -221,7 +221,7 @@ export default function FAQPage() {
           <div data-anim-group="footer-columns" className="grid grid-cols-1 md:grid-cols-12 gap-12 mb-16">
             <div data-anim="card" className="col-span-1 md:col-span-5 flex flex-col">
               <div className="relative h-[80px] w-[260px] mb-6">
-                <Image src="/images/footer-logo.svg" alt="Morocco Visa Service" fill className="object-contain object-left" />
+                <Image src="/images/footer-logo.webp" alt="Morocco Visa Service" fill className="object-contain object-left" />
               </div>
               <p className="text-white/70 text-[14px] leading-relaxed max-w-[320px]">
                 Professional Morocco visa assistance for UK travellers. Clear guidance, careful document support and responsive communication.
