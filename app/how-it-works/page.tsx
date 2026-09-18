@@ -7,37 +7,35 @@ export default function HowItWorksPage() {
     <div className="relative bg-[#F9F9F7] min-h-screen selection:bg-brand-red selection:text-white">
       <ScrollAnimations />
 
-      {/* Navigation Pill (Matches the rest of the site) */}
-      <div className="fixed top-0 left-0 right-0 z-50">
-        <header className="relative w-full pt-8 pb-4 px-6 md:px-12 flex items-center justify-between mx-auto max-w-[1400px]">
-          <div className="flex-shrink-0">
-            <a href="/">
-              <Image src="/images/header-logo-transparent.png" alt="Morocco Visa Service" width={220} height={78} priority />
+      {/* Navigation Header */}
+      <header data-anim-section="header" className="relative z-20 w-full pt-8 pb-4 px-6 md:px-12 flex items-center justify-between mx-auto max-w-[1400px]">
+        <div className="flex-shrink-0">
+          <a href="/">
+            <Image src="/images/header-logo-transparent.png" alt="Morocco Visa Service" width={220} height={78} priority />
+          </a>
+        </div>
+        
+        <div className="hidden lg:flex items-center bg-gray-50/80 backdrop-blur-md border border-gray-200/60 rounded-full p-1.5 pl-8 shadow-sm">
+          <nav className="flex items-center space-x-6 font-bold text-[14.5px] text-gray-700 mr-6">
+            <a href="/" className="hover:text-brand-red transition">Home</a>
+            <a href="/about" className="hover:text-brand-red transition">About Us</a>
+            <a href="/services" className="hover:text-brand-red transition">Services</a>
+            <a href="/how-it-works" className="bg-white text-brand-red font-bold px-4 py-2 rounded-full shadow-[0_2px_10px_rgba(0,0,0,0.03)] border border-gray-100">How It Works</a>
+            <a href="/faq" className="hover:text-brand-red transition">FAQs</a>
+          </nav>
+          <div className="flex items-center gap-2">
+            <a href="/contact" className="text-gray-900 font-bold text-[14.5px] px-2 hover:text-brand-red transition">
+              Contact Us
             </a>
+            <a href="/contact" className="bg-white text-brand-red px-5 py-2.5 rounded-full font-bold text-[13px] hover:bg-gray-50 transition shadow-[0_2px_10px_rgba(0,0,0,0.03)] border border-gray-100 flex items-center gap-2 inline-flex">
+              Apply for Visa <span className="text-lg leading-none">&rarr;</span></a>
           </div>
-          
-          <div className="hidden lg:flex items-center bg-gray-50/80 backdrop-blur-md border border-gray-200/60 rounded-full p-1.5 pl-8 shadow-sm">
-            <nav className="flex items-center space-x-6 font-bold text-[14.5px] text-gray-700 mr-6">
-              <a href="/" className="hover:text-brand-red transition">Home</a>
-              <a href="/about" className="hover:text-brand-red transition">About Us</a>
-              <a href="/services" className="hover:text-brand-red transition">Services</a>
-              <a href="/how-it-works" className="bg-white text-brand-red font-bold px-4 py-2 rounded-full shadow-[0_2px_10px_rgba(0,0,0,0.03)] border border-gray-100">How It Works</a>
-              <a href="/faq" className="hover:text-brand-red transition">FAQs</a>
-            </nav>
-            <div className="flex items-center gap-2">
-              <a href="/contact" className="text-gray-900 font-bold text-[14.5px] px-2 hover:text-brand-red transition">
-                Contact Us
-              </a>
-              <a href="/contact" className="bg-white text-brand-red px-5 py-2.5 rounded-full font-bold text-[13px] hover:bg-gray-50 transition shadow-[0_2px_10px_rgba(0,0,0,0.03)] border border-gray-100 flex items-center gap-2 inline-flex">
-                Apply for Visa <span className="text-lg leading-none">&rarr;</span></a>
-            </div>
-          </div>
-          <MobileMenu active="/how-it-works" />
-        </header>
-      </div>
+        </div>
+        <MobileMenu active="/how-it-works" />
+      </header>
 
-      {/* FIXED CENTERPIECE */}
-      <div className="sticky top-0 h-screen w-full flex items-center justify-center overflow-hidden z-0">
+      {/* FIXED CENTERPIECE (Desktop only) */}
+      <div className="hidden lg:flex sticky top-0 h-screen w-full items-center justify-center overflow-hidden z-0">
         {/* Light subtle background */}
         <div className="absolute inset-0 opacity-40">
           <Image src="/images/Sahara dunes.svg" alt="Background" fill className="object-cover grayscale mix-blend-multiply" />
@@ -45,7 +43,7 @@ export default function HowItWorksPage() {
         
         {/* Moroccan Arch Portal */}
         <div 
-          className="relative w-[280px] md:w-[350px] lg:w-[450px] h-[450px] md:h-[550px] lg:h-[700px] overflow-hidden border border-gray-200 shadow-[0_20px_50px_rgba(0,0,0,0.1)]"
+          className="relative w-[350px] lg:w-[450px] h-[550px] lg:h-[700px] overflow-hidden border border-gray-200 shadow-[0_20px_50px_rgba(0,0,0,0.1)]"
           style={{ borderRadius: '250px 250px 0 0' }}
         >
           <Image 
@@ -54,81 +52,92 @@ export default function HowItWorksPage() {
             fill 
             className="object-cover"
           />
-          {/* Subtle gradient overlay to make text readable on mobile */}
-          <div className="absolute inset-0 bg-gradient-to-b from-transparent via-white/80 to-[#F9F9F7] lg:hidden"></div>
         </div>
       </div>
 
       {/* SCROLLING CONTENT */}
-      <div className="relative z-10 w-full" style={{ marginTop: '-100vh' }}>
+      <div className="relative z-10 w-full lg:-mt-[100vh]">
         
         {/* Title Screen */}
-        <div className="h-screen w-full flex flex-col items-center justify-center pointer-events-none px-6">
-          <div className="bg-white/40 backdrop-blur-2xl p-10 md:p-16 rounded-[2.5rem] border border-white/60 shadow-[0_8px_32px_rgba(0,0,0,0.1)] flex flex-col items-center max-w-2xl text-center pointer-events-auto transition-transform hover:scale-[1.02] duration-500">
-            <span data-anim="fade-up" className="text-brand-red font-bold text-[12px] md:text-[14px] tracking-[0.4em] uppercase mb-6 block">Our Process</span>
-            <h1 data-anim="heading-clip-wipe" className="text-gray-900 text-5xl md:text-7xl lg:text-8xl font-playfair tracking-wide text-center">
+        <div className="py-12 sm:py-16 lg:py-0 lg:h-screen w-full flex flex-col items-center justify-center px-6 pointer-events-auto lg:pointer-events-none">
+          <div className="bg-white/70 lg:bg-white/40 backdrop-blur-2xl p-8 sm:p-10 md:p-16 rounded-[2.5rem] border border-white/60 shadow-[0_8px_32px_rgba(0,0,0,0.08)] flex flex-col items-center max-w-2xl text-center pointer-events-auto transition-transform hover:scale-[1.02] duration-500">
+            <span data-anim="fade-up" className="text-brand-red font-bold text-[12px] md:text-[14px] tracking-[0.4em] uppercase mb-4 sm:mb-6 block">Our Process</span>
+            <h1 data-anim="heading-clip-wipe" className="text-gray-900 text-4xl sm:text-5xl md:text-7xl lg:text-8xl font-playfair tracking-wide text-center">
               How It Works
             </h1>
-            <p data-anim="fade-up" className="text-gray-600 mt-8 max-w-md text-center text-sm md:text-base font-medium">
+            <p data-anim="fade-up" className="text-gray-600 mt-6 sm:mt-8 max-w-md text-center text-sm md:text-base font-medium leading-relaxed">
               Scroll to explore our streamlined four-step journey to your Moroccan adventure.
             </p>
+
+            {/* Arch Portal preview for Mobile */}
+            <div 
+              className="lg:hidden relative w-[220px] h-[300px] sm:w-[260px] sm:h-[350px] mt-8 overflow-hidden border border-gray-200 shadow-[0_15px_35px_rgba(0,0,0,0.08)]"
+              style={{ borderRadius: '140px 140px 0 0' }}
+            >
+              <Image 
+                src="/images/Detailed arches in a peaceful Moroccan riad.svg" 
+                alt="Portal" 
+                fill 
+                className="object-cover"
+              />
+            </div>
           </div>
         </div>
 
         {/* The Steps Container */}
-        <div className="max-w-[1400px] mx-auto pb-40">
+        <div className="max-w-[1400px] mx-auto px-6 md:px-12 lg:px-0 py-8 lg:py-0 lg:pb-40 flex flex-col gap-8 sm:gap-12 lg:gap-0">
           
           {/* STEP 01 */}
-          <div className="min-h-screen flex items-center justify-start px-6 md:px-12 lg:px-20">
-            <div className="w-full lg:w-[420px] xl:w-[480px] bg-white/40 backdrop-blur-2xl p-10 md:p-12 rounded-3xl border border-white/60 shadow-[0_8px_32px_rgba(0,0,0,0.1)]" data-anim="fade-up">
+          <div className="lg:min-h-screen flex items-center justify-center lg:justify-start lg:px-12 xl:px-20">
+            <div className="w-full lg:w-[420px] xl:w-[480px] bg-white/60 backdrop-blur-2xl p-8 sm:p-10 md:p-12 rounded-3xl border border-white/60 shadow-[0_8px_32px_rgba(0,0,0,0.08)] transition-transform hover:scale-[1.01] duration-300" data-anim="fade-up">
               <span className="text-brand-red font-bold text-sm md:text-lg tracking-[0.2em] mb-4 flex items-center gap-4">
                 <span className="w-8 h-[1px] bg-brand-red"></span> STEP 01
               </span>
-              <h2 className="text-gray-900 font-playfair text-4xl md:text-5xl lg:text-6xl mb-6">Submit Details</h2>
-              <p className="text-gray-600 text-base md:text-lg leading-relaxed font-medium">
+              <h2 className="text-gray-900 font-playfair text-3xl sm:text-4xl md:text-5xl lg:text-6xl mb-4 sm:mb-6">Submit Details</h2>
+              <p className="text-gray-600 text-sm sm:text-base md:text-lg leading-relaxed font-medium">
                 Fill out our beautifully designed, natural language application form. It takes less than 5 minutes and requires zero complex paperwork upfront. Your journey begins with a single click.
               </p>
             </div>
           </div>
 
           {/* STEP 02 */}
-          <div className="min-h-screen flex items-center justify-end px-6 md:px-12 lg:px-20">
-            <div className="w-full lg:w-[420px] xl:w-[480px] bg-white/40 backdrop-blur-2xl p-10 md:p-12 rounded-3xl border border-white/60 shadow-[0_8px_32px_rgba(0,0,0,0.1)]" data-anim="fade-up">
+          <div className="lg:min-h-screen flex items-center justify-center lg:justify-end lg:px-12 xl:px-20">
+            <div className="w-full lg:w-[420px] xl:w-[480px] bg-white/60 backdrop-blur-2xl p-8 sm:p-10 md:p-12 rounded-3xl border border-white/60 shadow-[0_8px_32px_rgba(0,0,0,0.08)] transition-transform hover:scale-[1.01] duration-300" data-anim="fade-up">
               <span className="text-brand-red font-bold text-sm md:text-lg tracking-[0.2em] mb-4 flex items-center gap-4 lg:flex-row-reverse">
                 <span className="w-8 h-[1px] bg-brand-red"></span> STEP 02
               </span>
-              <h2 className="text-gray-900 font-playfair text-4xl md:text-5xl lg:text-6xl mb-6 lg:text-right">Verification</h2>
-              <p className="text-gray-600 text-base md:text-lg leading-relaxed font-medium lg:text-right">
+              <h2 className="text-gray-900 font-playfair text-3xl sm:text-4xl md:text-5xl lg:text-6xl mb-4 sm:mb-6 lg:text-right">Verification</h2>
+              <p className="text-gray-600 text-sm sm:text-base md:text-lg leading-relaxed font-medium lg:text-right">
                 Our immigration specialists meticulously review every detail of your application. We cross-reference against all Kingdom of Morocco requirements to guarantee zero delays.
               </p>
             </div>
           </div>
 
           {/* STEP 03 */}
-          <div className="min-h-screen flex items-center justify-start px-6 md:px-12 lg:px-20">
-            <div className="w-full lg:w-[420px] xl:w-[480px] bg-white/40 backdrop-blur-2xl p-10 md:p-12 rounded-3xl border border-white/60 shadow-[0_8px_32px_rgba(0,0,0,0.1)]" data-anim="fade-up">
+          <div className="lg:min-h-screen flex items-center justify-center lg:justify-start lg:px-12 xl:px-20">
+            <div className="w-full lg:w-[420px] xl:w-[480px] bg-white/60 backdrop-blur-2xl p-8 sm:p-10 md:p-12 rounded-3xl border border-white/60 shadow-[0_8px_32px_rgba(0,0,0,0.08)] transition-transform hover:scale-[1.01] duration-300" data-anim="fade-up">
               <span className="text-brand-red font-bold text-sm md:text-lg tracking-[0.2em] mb-4 flex items-center gap-4">
                 <span className="w-8 h-[1px] bg-brand-red"></span> STEP 03
               </span>
-              <h2 className="text-gray-900 font-playfair text-4xl md:text-5xl lg:text-6xl mb-6">Processing</h2>
-              <p className="text-gray-600 text-base md:text-lg leading-relaxed font-medium">
+              <h2 className="text-gray-900 font-playfair text-3xl sm:text-4xl md:text-5xl lg:text-6xl mb-4 sm:mb-6">Processing</h2>
+              <p className="text-gray-600 text-sm sm:text-base md:text-lg leading-relaxed font-medium">
                 Your application is fast-tracked through our dedicated embassy channels. Sit back and relax while we handle the bureaucracy. You will receive real-time SMS and email updates at every milestone.
               </p>
             </div>
           </div>
 
           {/* STEP 04 */}
-          <div className="min-h-screen flex items-center justify-end px-6 md:px-12 lg:px-20">
-            <div className="w-full lg:w-[420px] xl:w-[480px] bg-white/40 backdrop-blur-2xl p-10 md:p-12 rounded-3xl border border-white/60 shadow-[0_8px_32px_rgba(0,0,0,0.1)]" data-anim="fade-up">
+          <div className="lg:min-h-screen flex items-center justify-center lg:justify-end lg:px-12 xl:px-20">
+            <div className="w-full lg:w-[420px] xl:w-[480px] bg-white/60 backdrop-blur-2xl p-8 sm:p-10 md:p-12 rounded-3xl border border-white/60 shadow-[0_8px_32px_rgba(0,0,0,0.08)] transition-transform hover:scale-[1.01] duration-300" data-anim="fade-up">
               <span className="text-brand-red font-bold text-sm md:text-lg tracking-[0.2em] mb-4 flex items-center gap-4 lg:flex-row-reverse">
                 <span className="w-8 h-[1px] bg-brand-red"></span> STEP 04
               </span>
-              <h2 className="text-gray-900 font-playfair text-4xl md:text-5xl lg:text-6xl mb-6 lg:text-right">Visa Granted</h2>
-              <p className="text-gray-600 text-base md:text-lg leading-relaxed font-medium lg:text-right mb-10">
+              <h2 className="text-gray-900 font-playfair text-3xl sm:text-4xl md:text-5xl lg:text-6xl mb-4 sm:mb-6 lg:text-right">Visa Granted</h2>
+              <p className="text-gray-600 text-sm sm:text-base md:text-lg leading-relaxed font-medium lg:text-right mb-6 sm:mb-10">
                 Success! Your approved visa is securely delivered directly to your inbox. You are now fully prepared to experience the magic, culture, and beauty of Morocco.
               </p>
               <div className="flex lg:justify-end">
-                <a href="/services" className="bg-brand-red text-white px-8 py-4 rounded-full font-bold text-[14px] tracking-wide hover:bg-[#8A2728] transition shadow-[0_4px_20px_rgba(163,49,50,0.4)] flex items-center gap-3">
+                <a href="/services" className="w-full sm:w-auto bg-brand-red text-white px-8 py-4 rounded-full font-bold text-[14px] tracking-wide hover:bg-[#8A2728] transition shadow-[0_4px_20px_rgba(163,49,50,0.4)] flex items-center justify-center gap-3">
                   Start Application <span>&rarr;</span>
                 </a>
               </div>

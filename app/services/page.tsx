@@ -80,10 +80,10 @@ export default function ServicesPage() {
           </div>
 
           {/* Right Column - Stacking Cards */}
-          <div className="lg:w-7/12 flex flex-col gap-[4vh] lg:gap-0 lg:pb-[25vh] relative z-20">
+          <div className="w-full lg:w-7/12 flex flex-col pb-[25vh] relative z-20">
             
             {/* Card 1: Tourist */}
-            <div data-anim="fade-up" className="lg:sticky lg:top-[15vh] w-full bg-white rounded-[2.5rem] shadow-[0_20px_50px_rgb(0,0,0,0.04)] overflow-hidden border border-gray-100 flex flex-col md:flex-row min-h-[420px] mb-[2vh] transition-transform duration-500 hover:scale-[1.02]">
+            <div className="sticky top-[6vh] lg:top-[12vh] w-full bg-white rounded-[2.5rem] shadow-[0_20px_50px_rgb(0,0,0,0.04)] overflow-hidden border border-gray-100 flex flex-col md:flex-row min-h-[420px] mb-[25vh] lg:mb-[35vh] transition-transform duration-500 hover:scale-[1.02]">
               <div className="w-full md:w-1/2 p-8 md:p-12 flex flex-col justify-between relative bg-white z-10">
                 <div>
                   <span className="text-brand-red font-bold text-[10px] tracking-[0.2em] uppercase mb-4 block">01 / Leisure</span>
@@ -105,7 +105,7 @@ export default function ServicesPage() {
             </div>
 
             {/* Card 2: Business */}
-            <div data-anim="fade-up" className="lg:sticky lg:top-[22vh] w-full bg-[#1a1a1a] text-white rounded-[2.5rem] shadow-[0_30px_60px_rgb(0,0,0,0.15)] overflow-hidden flex flex-col md:flex-row min-h-[420px] mb-[2vh] transition-transform duration-500 hover:scale-[1.02]">
+            <div className="sticky top-[10vh] lg:top-[18vh] w-full bg-[#1a1a1a] text-white rounded-[2.5rem] shadow-[0_30px_60px_rgb(0,0,0,0.15)] overflow-hidden flex flex-col md:flex-row min-h-[420px] mb-[25vh] lg:mb-[35vh] transition-transform duration-500 hover:scale-[1.02]">
               <div className="w-full md:w-1/2 p-8 md:p-12 flex flex-col justify-between relative z-10">
                 <div>
                   <span className="text-[#E76C53] font-bold text-[10px] tracking-[0.2em] uppercase mb-4 block">02 / Corporate</span>
@@ -128,7 +128,7 @@ export default function ServicesPage() {
             </div>
 
             {/* Card 3: Visit */}
-            <div data-anim="fade-up" className="lg:sticky lg:top-[29vh] w-full bg-[#5E1A1A] text-white rounded-[2.5rem] shadow-[0_40px_70px_rgb(0,0,0,0.2)] overflow-hidden flex flex-col md:flex-row min-h-[420px] mb-[2vh] transition-transform duration-500 hover:scale-[1.02]">
+            <div className="sticky top-[14vh] lg:top-[24vh] w-full bg-[#5E1A1A] text-white rounded-[2.5rem] shadow-[0_40px_70px_rgb(0,0,0,0.2)] overflow-hidden flex flex-col md:flex-row min-h-[420px] mb-[25vh] lg:mb-[35vh] transition-transform duration-500 hover:scale-[1.02]">
               <div className="w-full md:w-1/2 p-8 md:p-12 flex flex-col justify-between relative z-10">
                 <div>
                   <span className="text-[#E5B3B3] font-bold text-[10px] tracking-[0.2em] uppercase mb-4 block">03 / Personal</span>
@@ -150,7 +150,7 @@ export default function ServicesPage() {
             </div>
 
             {/* Card 4: Transit */}
-            <div data-anim="fade-up" className="lg:sticky lg:top-[36vh] w-full bg-[#0B4A5D] text-white rounded-[2.5rem] shadow-[0_50px_80px_rgb(0,0,0,0.25)] overflow-hidden flex flex-col md:flex-row min-h-[420px] transition-transform duration-500 hover:scale-[1.02]">
+            <div className="sticky top-[18vh] lg:top-[30vh] w-full bg-[#0B4A5D] text-white rounded-[2.5rem] shadow-[0_50px_80px_rgb(0,0,0,0.25)] overflow-hidden flex flex-col md:flex-row min-h-[420px] transition-transform duration-500 hover:scale-[1.02]">
               <div className="w-full md:w-1/2 p-8 md:p-12 flex flex-col justify-between relative z-10">
                 <div>
                   <span className="text-[#A2C7D4] font-bold text-[10px] tracking-[0.2em] uppercase mb-4 block">04 / Journey</span>
