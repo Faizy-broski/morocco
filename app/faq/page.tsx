@@ -59,6 +59,7 @@ export default function FAQPage() {
             <a href="/services" className="hover:text-brand-red transition">Services</a>
             <a href="/how-it-works" className="hover:text-brand-red transition">How It Works</a>
             <a href="/faq" className="bg-white text-brand-red font-bold px-4 py-2 rounded-full shadow-[0_2px_10px_rgba(0,0,0,0.03)] border border-gray-100">FAQs</a>
+            <a href="/track" className="hover:text-brand-red transition">Track Enquiry</a>
           </nav>
           <div className="flex items-center gap-2">
             <a href="/contact" className="text-gray-900 font-bold text-[14.5px] px-2 hover:text-brand-red transition">
@@ -277,7 +278,7 @@ export default function FAQPage() {
             </div>
           </div>
           <div data-anim="fade-only" className="border-t border-white/20 pt-8 flex flex-col md:flex-row items-center justify-between gap-4">
-            <p className="text-white/50 text-[13px]">&copy; 2026 Morocco Visa Service. All rights reserved.</p>
+            <p className="text-white/50 text-[13px]">Designed & Developed with ❤️ by TSN &copy; 2026 Morocco Visa Service. All rights reserved.</p>
           </div>
         </div>
       </footer>

@@ -35,6 +35,7 @@ export default function Home() {
             <a href="/services" className="hover:text-brand-red transition">Services</a>
             <a href="/how-it-works" className="hover:text-brand-red transition">How It Works</a>
             <a href="/faq" className="hover:text-brand-red transition">FAQs</a>
+            <a href="/track" className="hover:text-brand-red transition">Track Enquiry</a>
           </nav>
           <div className="flex items-center gap-2">
             <a href="/contact" className="text-gray-900 font-bold text-[14.5px] px-2 hover:text-brand-red transition">
@@ -639,25 +640,54 @@ export default function Home() {
             </div>
           </div>
 
-          {/* Giant Morocco Text with Image Mask */}
-          <div className="relative w-full mt-20 md:mt-28 mb-10 flex justify-center items-center">
-            <h2
-              data-anim="clip-wipe-left"
-              className="font-playfair font-bold text-[56px] min-[400px]:text-[72px] sm:text-[110px] md:text-[180px] lg:text-[260px] xl:text-[320px] leading-[0.8] tracking-tighter uppercase w-full text-center"
-              style={{
-                backgroundImage: "url('/images/morocco.webp')",
-                backgroundSize: "cover",
-                backgroundPosition: "center",
-                WebkitBackgroundClip: "text",
-                color: "transparent"
-              }}
-            >
-              MOROCCO
-            </h2>
+          {/* Giant Morocco Text with Airplane Watermark & Gate Sticker */}
+          <div className="relative w-full mt-24 md:mt-32 mb-16 flex justify-center items-center">
+            {/* Background Plane Blueprint Watermark */}
+            <div className="absolute inset-0 flex items-center justify-center pointer-events-none -z-10 overflow-visible">
+              <div className="relative w-full max-w-[1400px] h-[360px] sm:h-[480px] md:h-[620px] lg:h-[720px] opacity-[0.14]">
+                <Image
+                  src="/images/raw-plane.webp"
+                  alt=""
+                  fill
+                  className="object-contain object-top select-none"
+                  priority
+                />
+              </div>
+            </div>
 
-            {/* Sticker */}
-            <div data-anim="rotate-in" className="absolute right-[0%] sm:right-[5%] md:right-[12%] lg:right-[16%] bottom-[-5%] sm:bottom-[-10%] md:bottom-[-20%] w-[100px] sm:w-[140px] md:w-[240px] z-20 hover:scale-105 transition-transform duration-500 cursor-pointer drop-shadow-2xl">
-              <Image src="/images/gate.svg" alt="Your Gate is Open" width={240} height={200} className="object-contain" />
+            {/* Content Box for MOROCCO SVG and Gate Sticker */}
+            <div className="relative w-full max-w-[1400px] mx-auto flex items-center justify-center">
+              <h2 className="sr-only">Morocco</h2>
+              {/* MOROCCO SVG Text Artwork */}
+              <div
+                data-anim="clip-wipe-left"
+                className="w-full relative flex items-center justify-center select-none"
+              >
+                <Image
+                  src="/images/MOROCCO.svg"
+                  alt="MOROCCO"
+                  width={1440}
+                  height={209}
+                  className="w-full h-auto object-contain select-none pointer-events-none"
+                  priority
+                />
+              </div>
+
+              {/* Gate Sticker ("YOUR GATE IS OPEN") */}
+              <div
+                data-anim="rotate-in"
+                className="absolute left-[56.2%] top-[14%] w-[21.5%] max-w-[310px] min-w-[80px] z-20 hover:scale-105 transition-transform duration-500 cursor-pointer"
+              >
+                <a href="/contact" className="block w-full h-auto" title="Your Gate Is Open - Apply for Visa">
+                  <Image
+                    src="/images/gate.svg"
+                    alt="Your Gate is Open"
+                    width={309}
+                    height={254}
+                    className="w-full h-auto object-contain drop-shadow-2xl"
+                  />
+                </a>
+              </div>
             </div>
           </div>
 
@@ -916,7 +946,7 @@ export default function Home() {
 
           {/* Bottom Bar */}
           <div data-anim="fade-only" className="border-t border-white/20 pt-8 flex flex-col md:flex-row items-center justify-between gap-4">
-            <p className="text-white/50 text-[13px]">
+            <p className="text-white/50 text-[13px]">Designed & Developed with ❤️ by TSN 
               &copy; 2026 Morocco Visa Service. All rights reserved.
             </p>
             <div className="flex items-center gap-4">

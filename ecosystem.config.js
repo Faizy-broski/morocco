@@ -1,0 +1,14 @@
+module.exports = {
+  apps: [
+    {
+      name: "morocco-visa",
+      cwd: __dirname,
+      script: "node_modules/next/dist/bin/next",
+      args: "start -p 3002",
+      env: {
+        NODE_ENV: "production",
+        PORT: 3002,
+      },
+    },
+  ],
+};

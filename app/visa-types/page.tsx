@@ -58,6 +58,7 @@ export default function VisaTypesPage() {
               <a href="/services" className="bg-white text-brand-red font-bold px-4 py-2 rounded-full shadow-[0_2px_10px_rgba(0,0,0,0.03)] border border-gray-100">Services</a>
               <a href="/how-it-works" className="hover:text-brand-red transition">How It Works</a>
               <a href="/faq" className="hover:text-brand-red transition">FAQs</a>
+              <a href="/track" className="hover:text-brand-red transition">Track Enquiry</a>
             </nav>
             <div className="flex items-center gap-2">
               <a href="/contact" className="text-gray-900 font-bold text-[14.5px] px-2 hover:text-brand-red transition">
@@ -180,7 +181,7 @@ export default function VisaTypesPage() {
           </div>
           
           <div className="border-t border-white/10 pt-8 flex flex-col md:flex-row items-center justify-between gap-4">
-            <p className="text-white/40 text-[12px]">
+            <p className="text-white/40 text-[12px]">Designed & Developed with ❤️ by TSN 
               &copy; {new Date().getFullYear()} Morocco Visa Service. All rights reserved.
             </p>
             <div className="flex items-center gap-6">

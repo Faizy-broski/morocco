@@ -9,6 +9,7 @@ const links = [
   { href: "/services", label: "Services" },
   { href: "/how-it-works", label: "How It Works" },
   { href: "/faq", label: "FAQs" },
+  { href: "/track", label: "Track Enquiry" },
 ];
 
 export default function MobileMenu({ active }: { active: string }) {

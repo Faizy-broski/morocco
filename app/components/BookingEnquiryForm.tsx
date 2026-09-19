@@ -3,14 +3,8 @@
 import { useState, FormEvent } from "react";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
-
-const visaTypes = [
-  "Tourist Visa",
-  "Business Visa",
-  "Student Visa",
-  "Work Visa",
-  "Transit Visa",
-];
+import { VISA_TYPES } from "@/app/lib/constants";
+import EnquirySuccessModal from "@/app/components/EnquirySuccessModal";
 
 export default function BookingEnquiryForm() {
   const [fullName, setFullName] = useState("");
@@ -18,14 +12,35 @@ export default function BookingEnquiryForm() {
   const [visaType, setVisaType] = useState("");
   const [travelDate, setTravelDate] = useState<Date | null>(null);
   const [travellers, setTravellers] = useState(1);
-  const [submitted, setSubmitted] = useState(false);
+  const [submitState, setSubmitState] = useState<"idle" | "loading" | "error">("idle");
+  const [trackingCode, setTrackingCode] = useState<string | null>(null);
 
   const decrementTravellers = () => setTravellers((count) => Math.max(1, count - 1));
   const incrementTravellers = () => setTravellers((count) => Math.min(20, count + 1));
 
-  const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    setSubmitted(true);
+    setSubmitState("loading");
+    try {
+      const res = await fetch("/api/enquiries", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          fullName,
+          email,
+          visaType,
+          travelDate,
+          travellers,
+          source: "homepage",
+        }),
+      });
+      if (!res.ok) throw new Error("Request failed");
+      const data = await res.json();
+      setTrackingCode(data.trackingCode);
+      setSubmitState("idle");
+    } catch {
+      setSubmitState("error");
+    }
   };
 
   return (
@@ -146,7 +161,7 @@ export default function BookingEnquiryForm() {
             className="bg-transparent border-none outline-none text-gray-900 font-medium w-full text-[15px] appearance-none cursor-pointer pr-6"
           >
             <option value="" disabled>Select visa type</option>
-            {visaTypes.map((type) => (
+            {VISA_TYPES.map((type) => (
               <option key={type} value={type}>{type}</option>
             ))}
           </select>
@@ -203,16 +218,24 @@ export default function BookingEnquiryForm() {
         </div>
 
         <div className="col-span-1 flex items-center">
-          <button type="submit" className="w-full bg-brand-red text-white rounded-[1.25rem] font-medium hover:bg-[#8A2728] transition flex items-center justify-center gap-2 text-[14px] py-4">
-            Send Enquiry <span className="text-lg leading-none">&rarr;</span>
+          <button
+            type="submit"
+            disabled={submitState === "loading"}
+            className="w-full bg-brand-red text-white rounded-[1.25rem] font-medium hover:bg-[#8A2728] transition flex items-center justify-center gap-2 text-[14px] py-4 disabled:opacity-60"
+          >
+            {submitState === "loading" ? "Sending..." : "Send Enquiry"} <span className="text-lg leading-none">&rarr;</span>
           </button>
         </div>
       </form>
 
-      {submitted && (
-        <p className="mt-4 text-sm font-medium text-green-700">
-          Thanks {fullName || "there"}! We've received your enquiry for {travellers} {travellers === 1 ? "traveller" : "travellers"}{visaType ? ` (${visaType})` : ""} and will be in touch shortly.
+      {submitState === "error" && (
+        <p className="mt-4 text-sm font-medium text-red-700">
+          Something went wrong sending your enquiry. Please try again.
         </p>
+      )}
+
+      {trackingCode && (
+        <EnquirySuccessModal trackingCode={trackingCode} onClose={() => setTrackingCode(null)} />
       )}
     </div>
   );

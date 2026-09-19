@@ -1,0 +1,35 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum EnquirySource {
+  homepage
+  contact
+}
+
+enum EnquiryStatus {
+  new
+  contacted
+  closed
+}
+
+model Enquiry {
+  id            String        @id @default(cuid())
+  trackingCode  String        @unique
+  fullName      String
+  email         String
+  visaType      String
+  travelDate    DateTime
+  travellers    Int
+  source        EnquirySource
+  status        EnquiryStatus @default(new)
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+
+  @@index([status])
+  @@index([createdAt])
+}

@@ -4,14 +4,8 @@ import { useState, FormEvent } from "react";
 import Image from "next/image";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
-
-const visaTypes = [
-  "Tourist Visa",
-  "Business Visa",
-  "Student Visa",
-  "Work Visa",
-  "Transit Visa",
-];
+import { VISA_TYPES } from "@/app/lib/constants";
+import EnquirySuccessModal from "@/app/components/EnquirySuccessModal";
 
 export default function ContactBookingForm() {
   const [fullName, setFullName] = useState("");
@@ -19,14 +13,35 @@ export default function ContactBookingForm() {
   const [visaType, setVisaType] = useState("");
   const [travelDate, setTravelDate] = useState<Date | null>(null);
   const [travellers, setTravellers] = useState(1);
-  const [submitted, setSubmitted] = useState(false);
+  const [submitState, setSubmitState] = useState<"idle" | "loading" | "error">("idle");
+  const [trackingCode, setTrackingCode] = useState<string | null>(null);
 
   const decrementTravellers = () => setTravellers((count) => Math.max(1, count - 1));
   const incrementTravellers = () => setTravellers((count) => Math.min(20, count + 1));
 
-  const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    setSubmitted(true);
+    setSubmitState("loading");
+    try {
+      const res = await fetch("/api/enquiries", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          fullName,
+          email,
+          visaType,
+          travelDate,
+          travellers,
+          source: "contact",
+        }),
+      });
+      if (!res.ok) throw new Error("Request failed");
+      const data = await res.json();
+      setTrackingCode(data.trackingCode);
+      setSubmitState("idle");
+    } catch {
+      setSubmitState("error");
+    }
   };
 
   const fieldClass = (delay: string) => `contact-form-field ${delay}`;
@@ -123,7 +138,7 @@ export default function ContactBookingForm() {
               className="bg-transparent border-none outline-none text-gray-900 font-semibold w-full text-[17px] appearance-none cursor-pointer pr-6"
             >
               <option value="" disabled>Select visa type</option>
-              {visaTypes.map((type) => (
+              {VISA_TYPES.map((type) => (
                 <option key={type} value={type}>{type}</option>
               ))}
             </select>
@@ -191,19 +206,24 @@ export default function ContactBookingForm() {
           <span className="text-gray-400 text-[11px] font-sans font-bold uppercase tracking-[0.2em]">Takes 1 minute</span>
           <button
             type="submit"
-            className="w-full sm:w-auto bg-brand-red text-white px-10 py-5 rounded-full font-sans font-bold text-[13px] tracking-widest uppercase hover:bg-[#8A2728] transition-all shadow-lg hover:shadow-xl hover:-translate-y-1 flex items-center justify-center gap-3 group"
+            disabled={submitState === "loading"}
+            className="w-full sm:w-auto bg-brand-red text-white px-10 py-5 rounded-full font-sans font-bold text-[13px] tracking-widest uppercase hover:bg-[#8A2728] transition-all shadow-lg hover:shadow-xl hover:-translate-y-1 flex items-center justify-center gap-3 group disabled:opacity-60 disabled:translate-y-0"
           >
-            Send Message
+            {submitState === "loading" ? "Sending..." : "Send Message"}
             <span className="text-xl group-hover:translate-x-1 transition-transform">&rarr;</span>
           </button>
         </div>
 
-        {submitted && (
-          <p className="text-sm font-medium text-green-700 mt-2">
-            Thanks {fullName || "there"}! We&apos;ve received your enquiry{visaType ? ` for a ${visaType}` : ""} and will be in touch shortly.
+        {submitState === "error" && (
+          <p className="text-sm font-medium text-red-700 mt-2">
+            Something went wrong sending your enquiry. Please try again.
           </p>
         )}
       </form>
+
+      {trackingCode && (
+        <EnquirySuccessModal trackingCode={trackingCode} onClose={() => setTrackingCode(null)} />
+      )}
     </div>
   );
 }
