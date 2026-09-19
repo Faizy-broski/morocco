@@ -9,3 +9,9 @@ export async function updateEnquiryStatus(id: string, status: "new" | "contacted
   await prisma.enquiry.update({ where: { id }, data: { status } });
   revalidatePath("/admin");
 }
+
+export async function deleteEnquiry(id: string) {
+  await verifySession();
+  await prisma.enquiry.delete({ where: { id } });
+  revalidatePath("/admin");
+}

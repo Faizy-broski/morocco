@@ -80,13 +80,13 @@ export default function ContactPage() {
           {/* Desktop Navigation Pill */}
           <div className="hidden lg:flex items-center justify-end p-12 relative z-30" data-anim="fade-up">
             <div className="flex items-center bg-white/20 backdrop-blur-lg border border-white/30 rounded-full p-1.5 pl-8 shadow-sm">
-              <nav className="flex items-center space-x-6 font-bold text-[14.5px] text-gray-700 mr-6">
+              <nav className="flex items-center space-x-6 font-bold text-[14.5px] text-gray-700 mr-6 whitespace-nowrap">
                 <a href="/" className="hover:text-brand-red transition">Home</a>
                 <a href="/about" className="hover:text-brand-red transition">About Us</a>
                 <a href="/services" className="hover:text-brand-red transition">Services</a>
                 <a href="/how-it-works" className="hover:text-brand-red transition">How It Works</a>
                 <a href="/faq" className="hover:text-brand-red transition">FAQs</a>
-                <a href="/track" className="hover:text-brand-red transition">Track Enquiry</a>
+                <a href="/track" className="hover:text-brand-red transition">Track</a>
               </nav>
               <div className="flex items-center gap-2">
                 <a href="/contact" className="text-brand-red font-bold text-[13px] px-2">

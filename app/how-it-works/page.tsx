@@ -16,13 +16,13 @@ export default function HowItWorksPage() {
         </div>
         
         <div className="hidden lg:flex items-center bg-gray-50/80 backdrop-blur-md border border-gray-200/60 rounded-full p-1.5 pl-8 shadow-sm">
-          <nav className="flex items-center space-x-6 font-bold text-[14.5px] text-gray-700 mr-6">
+          <nav className="flex items-center space-x-6 font-bold text-[14.5px] text-gray-700 mr-6 whitespace-nowrap">
             <a href="/" className="hover:text-brand-red transition">Home</a>
             <a href="/about" className="hover:text-brand-red transition">About Us</a>
             <a href="/services" className="hover:text-brand-red transition">Services</a>
             <a href="/how-it-works" className="bg-white text-brand-red font-bold px-4 py-2 rounded-full shadow-[0_2px_10px_rgba(0,0,0,0.03)] border border-gray-100">How It Works</a>
             <a href="/faq" className="hover:text-brand-red transition">FAQs</a>
-            <a href="/track" className="hover:text-brand-red transition">Track Enquiry</a>
+            <a href="/track" className="hover:text-brand-red transition">Track</a>
           </nav>
           <div className="flex items-center gap-2">
             <a href="/contact" className="text-gray-900 font-bold text-[14.5px] px-2 hover:text-brand-red transition">

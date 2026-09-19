@@ -4,6 +4,7 @@ import { logout } from "@/app/actions/auth";
 import { VISA_TYPES } from "@/app/lib/constants";
 import StatusSelect from "./StatusSelect";
 import RefreshButton from "./RefreshButton";
+import DeleteButton from "./DeleteButton";
 
 const PAGE_SIZE = 20;
 
@@ -223,6 +224,7 @@ export default async function AdminPage({
                   <th className="px-5 py-4">Source</th>
                   <th className="px-5 py-4">Status</th>
                   <th className="px-5 py-4">Submitted</th>
+                  <th className="px-5 py-4"></th>
                 </tr>
               </thead>
               <tbody>
@@ -252,11 +254,14 @@ export default async function AdminPage({
                         timeStyle: "short",
                       }).format(enquiry.createdAt)}
                     </td>
+                    <td className="px-5 py-4">
+                      <DeleteButton id={enquiry.id} fullName={enquiry.fullName} />
+                    </td>
                   </tr>
                 ))}
                 {enquiries.length === 0 && (
                   <tr>
-                    <td colSpan={8} className="px-5 py-10 text-center text-gray-400">
+                    <td colSpan={9} className="px-5 py-10 text-center text-gray-400">
                       No enquiries found.
                     </td>
                   </tr>

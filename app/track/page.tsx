@@ -2,6 +2,8 @@
 
 import { Suspense, useEffect, useState, FormEvent } from "react";
 import { useSearchParams } from "next/navigation";
+import Image from "next/image";
+import MobileMenu from "@/app/components/MobileMenu";
 
 type TrackedEnquiry = {
   trackingCode: string;
@@ -64,8 +66,36 @@ function TrackForm() {
   };
 
   return (
-    <div className="min-h-screen bg-[#F9F9F7] flex items-center justify-center px-4 py-16">
-      <div className="w-full max-w-lg bg-white rounded-[2rem] shadow-[0_20px_60px_rgb(0,0,0,0.08)] p-8 lg:p-10">
+    <div className="min-h-screen bg-[#F9F9F7] flex flex-col items-center pb-16">
+      {/* Header */}
+      <header className="relative z-50 w-full pt-8 pb-4 px-6 md:px-12 flex items-center justify-between mx-auto max-w-[1400px]">
+        <div className="flex-shrink-0">
+          <a href="/">
+            <Image src="/images/header-logo-transparent.webp" alt="Morocco Visa Service" width={220} height={78} priority />
+          </a>
+        </div>
+        {/* Navigation Pill */}
+        <div className="hidden lg:flex items-center bg-white/20 backdrop-blur-lg border border-white/30 rounded-full p-1.5 pl-8 shadow-sm">
+          <nav className="flex items-center space-x-6 font-bold text-[14.5px] text-gray-700 mr-6 whitespace-nowrap">
+            <a href="/" className="hover:text-brand-red transition">Home</a>
+            <a href="/about" className="hover:text-brand-red transition">About Us</a>
+            <a href="/services" className="hover:text-brand-red transition">Services</a>
+            <a href="/how-it-works" className="hover:text-brand-red transition">How It Works</a>
+            <a href="/faq" className="hover:text-brand-red transition">FAQs</a>
+            <a href="/track" className="bg-white text-brand-red font-bold px-4 py-2 rounded-full shadow-[0_2px_10px_rgba(0,0,0,0.03)] border border-gray-100">Track</a>
+          </nav>
+          <div className="flex items-center gap-2">
+            <a href="/contact" className="text-gray-900 font-bold text-[14.5px] px-2 hover:text-brand-red transition">
+              Contact Us
+            </a>
+            <a href="/contact" className="bg-white text-brand-red px-5 py-2.5 rounded-full font-bold text-[13px] hover:bg-gray-50 transition shadow-[0_2px_10px_rgba(0,0,0,0.03)] border border-gray-100 flex items-center gap-2 inline-flex">
+              Apply for Visa <span className="text-lg leading-none">&rarr;</span></a>
+          </div>
+        </div>
+        <MobileMenu active="/track" />
+      </header>
+
+      <div className="w-full max-w-lg mx-4 bg-white rounded-[2rem] shadow-[0_20px_60px_rgb(0,0,0,0.08)] p-8 lg:p-10 mt-8">
         <p className="text-brand-red text-[11px] font-bold tracking-widest uppercase mb-2">Track Enquiry</p>
         <h1 className="font-playfair text-3xl font-medium text-gray-900 mb-8">Check Your Enquiry Status</h1>
 

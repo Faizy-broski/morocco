@@ -29,13 +29,13 @@ export default function Home() {
         </div>
         {/* Navigation Pill */}
         <div data-anim="header-item" className="hidden lg:flex items-center bg-white/20 backdrop-blur-lg border border-white/30 rounded-full p-1.5 pl-8 shadow-sm">
-          <nav className="flex items-center space-x-6 font-bold text-[14.5px] text-gray-700 mr-6">
+          <nav className="flex items-center space-x-6 font-bold text-[14.5px] text-gray-700 mr-6 whitespace-nowrap">
             <a href="/" className="bg-white text-brand-red font-bold px-4 py-2 rounded-full shadow-[0_2px_10px_rgba(0,0,0,0.03)] border border-gray-100">Home</a>
             <a href="/about" className="hover:text-brand-red transition">About Us</a>
             <a href="/services" className="hover:text-brand-red transition">Services</a>
             <a href="/how-it-works" className="hover:text-brand-red transition">How It Works</a>
             <a href="/faq" className="hover:text-brand-red transition">FAQs</a>
-            <a href="/track" className="hover:text-brand-red transition">Track Enquiry</a>
+            <a href="/track" className="hover:text-brand-red transition">Track</a>
           </nav>
           <div className="flex items-center gap-2">
             <a href="/contact" className="text-gray-900 font-bold text-[14.5px] px-2 hover:text-brand-red transition">
@@ -711,7 +711,7 @@ export default function Home() {
 
             {/* Center Image */}
             <div data-anim="fade-up" data-anim-delay="0.15" className="w-full lg:w-1/3 flex justify-center relative h-[250px] md:h-[350px]">
-              <Image src="/images/files.webp" alt="Documents" fill className="object-contain drop-shadow-2xl" />
+              <Image src="/images/documents.png" alt="Documents" fill className="object-contain drop-shadow-2xl" />
             </div>
 
             {/* Right List */}
