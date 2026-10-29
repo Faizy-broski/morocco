@@ -1,8 +1,8 @@
 import "server-only";
-import { Resend } from "resend";
+import nodemailer from "nodemailer";
 import type { Enquiry } from "@prisma/client";
 
-const BUSINESS_EMAIL = "services@moroccovisaservice.com";
+const BUSINESS_EMAIL = process.env.SMTP_USER || "services@moroccovisaservice.com";
 const FROM = `Morocco Visa Service <${BUSINESS_EMAIL}>`;
 const SITE_URL = "https://moroccovisaservice.com";
 
@@ -20,12 +20,18 @@ function formatTravelDate(date: Date) {
 }
 
 export async function sendEnquiryNotification(enquiry: Enquiry) {
-  if (!process.env.RESEND_API_KEY) {
-    console.warn("RESEND_API_KEY not set — skipping enquiry emails");
+  if (!process.env.SMTP_HOST || !process.env.SMTP_USER || !process.env.SMTP_PASS) {
+    console.warn("SMTP_HOST / SMTP_USER / SMTP_PASS not set — skipping enquiry emails");
     return;
   }
 
-  const resend = new Resend(process.env.RESEND_API_KEY);
+  const port = Number(process.env.SMTP_PORT || 465);
+  const transporter = nodemailer.createTransport({
+    host: process.env.SMTP_HOST,
+    port,
+    secure: port === 465,
+    auth: { user: process.env.SMTP_USER, pass: process.env.SMTP_PASS },
+  });
   const name = escapeHtml(enquiry.fullName);
   const email = escapeHtml(enquiry.email);
   const visaType = escapeHtml(enquiry.visaType);
@@ -34,7 +40,7 @@ export async function sendEnquiryNotification(enquiry: Enquiry) {
   const trackUrl = `${SITE_URL}/track?code=${encodeURIComponent(enquiry.trackingCode)}`;
 
   const results = await Promise.allSettled([
-    resend.emails.send({
+    transporter.sendMail({
       from: FROM,
       to: process.env.ADMIN_NOTIFICATION_EMAIL || BUSINESS_EMAIL,
       replyTo: enquiry.email,
@@ -49,7 +55,7 @@ export async function sendEnquiryNotification(enquiry: Enquiry) {
         <p><strong>Source:</strong> ${enquiry.source}</p>
       `,
     }),
-    resend.emails.send({
+    transporter.sendMail({
       from: FROM,
       to: enquiry.email,
       replyTo: BUSINESS_EMAIL,
@@ -76,8 +82,6 @@ export async function sendEnquiryNotification(enquiry: Enquiry) {
   for (const result of results) {
     if (result.status === "rejected") {
       console.error("Failed to send enquiry email", result.reason);
-    } else if (result.value.error) {
-      console.error("Resend rejected enquiry email", result.value.error);
     }
   }
 }
