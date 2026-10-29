@@ -2,7 +2,7 @@ import "server-only";
 import { Resend } from "resend";
 import type { Enquiry } from "@prisma/client";
 
-const BUSINESS_EMAIL = "info@moroccovisaservice.com";
+const BUSINESS_EMAIL = "service@moroccovisaservice.com";
 const FROM = `Morocco Visa Service <${BUSINESS_EMAIL}>`;
 const SITE_URL = "https://moroccovisaservice.com";
 
