@@ -38,6 +38,7 @@ const GREEN = "#006233";
 const RED = "#C1272D";
 const MUTED = "#C9B5B5";
 const MAX_BYTES = 5 * 1024 * 1024;
+const RESUME_KEY = "mv_application_token";
 
 const STEPS = [
   { label: "Eligibility", icon: "M12 3l8 3v6c0 5-3.5 8-8 9-4.5-1-8-4-8-9V6zM9 12l2 2 4-4" },
@@ -185,6 +186,51 @@ export default function ApplicationForm({
   const [errs, setErrs] = useState<Record<string, string>>({});
   const [banner, setBanner] = useState("");
   const [busy, setBusy] = useState(false);
+
+  // Coming back (Stripe "back" link, browser Back, refresh): restore what was already saved on the server.
+  useEffect(() => {
+    if (initialToken) return;
+    let token: string | null = null;
+    try {
+      token = localStorage.getItem(RESUME_KEY);
+    } catch {
+      return;
+    }
+    if (!token) return;
+    let cancelled = false;
+    (async () => {
+      try {
+        const res = await fetch(`/api/applications/${token}`);
+        if (!res.ok) {
+          localStorage.removeItem(RESUME_KEY); // paid or no longer exists
+          return;
+        }
+        const data = (await res.json()) as { enquiry: EnquiryValues; saved: SavedTraveller[] };
+        if (cancelled || tokenRef.current) return;
+        tokenRef.current = token;
+        serverRef.current = { travellers: data.enquiry.travellers, processing: data.enquiry.processing, email: data.enquiry.email };
+        setEnq(data.enquiry);
+        setDrafts(Object.fromEntries(data.saved.map((x) => [x.position, newDraft(x.position, data.enquiry, x)])));
+        setServerSaved(new Set(data.saved.map((x) => x.position)));
+        const done = new Set(data.saved.map((x) => x.position));
+        let next = data.enquiry.travellers;
+        for (let i = 1; i <= data.enquiry.travellers; i++) {
+          if (!done.has(i)) {
+            next = i;
+            break;
+          }
+        }
+        setIdx(next);
+        setStep(done.has(next) ? 6 : 2);
+        if (data.saved.length) setBanner("Welcome back — we've restored the details you already saved.");
+      } catch {
+        // offline: start fresh
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [initialToken]);
 
   const N = enq.travellers;
   const draft = drafts[idx] ?? newDraft(idx, enq);
@@ -353,6 +399,11 @@ export default function ApplicationForm({
         const d = await r.json().catch(() => ({}));
         if (!r.ok) throw new Error(d.error ?? "Could not start your application. Please check your details and try again.");
         tokenRef.current = String(d.applyUrl).split("/").pop()!;
+        try {
+          localStorage.setItem(RESUME_KEY, tokenRef.current);
+        } catch {
+          // storage unavailable: resuming simply won't be offered
+        }
         serverRef.current = { travellers: N, processing: enq.processing, email: contactEmail };
       } else if (srv.travellers !== N || srv.processing !== enq.processing || (idx === 1 && srv.email !== contactEmail)) {
         const r = await fetch(`/api/applications/${tokenRef.current}/enquiry`, {

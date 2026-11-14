@@ -126,6 +126,16 @@ function TrackForm() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [returnedPaid, enquiry?.trackingCode, enquiry?.paymentStatus]);
 
+  // Payment done: forget the saved draft so the next application starts clean.
+  useEffect(() => {
+    if (enquiry?.paymentStatus !== "paid") return;
+    try {
+      localStorage.removeItem("mv_application_token");
+    } catch {
+      // ignore
+    }
+  }, [enquiry?.paymentStatus]);
+
   const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     lookup(code);
