@@ -9,9 +9,13 @@ type TrackedEnquiry = {
   trackingCode: string;
   fullName: string;
   visaType: string;
+  processing: string;
   travelDate: string;
   travellers: number;
   status: "new" | "contacted" | "closed";
+  paymentStatus: "unpaid" | "paid" | "refunded";
+  detailsCompletedAt: string | null;
+  amountPence: number;
   createdAt: string;
 };
 
@@ -34,12 +38,61 @@ function TrackForm() {
   const [state, setState] = useState<"idle" | "loading" | "error">("idle");
   const [errorMessage, setErrorMessage] = useState("");
 
-  const lookup = async (trackingCode: string) => {
-    if (!trackingCode.trim()) return;
-    setState("loading");
-    setEnquiry(null);
+  const [payError, setPayError] = useState("");
+  const [paying, setPaying] = useState(false);
+  const [needsDetails, setNeedsDetails] = useState(false);
+  const [resendEmail, setResendEmail] = useState("");
+  const [resendMsg, setResendMsg] = useState("");
+
+  const resendLink = async () => {
+    if (!enquiry) return;
+    setResendMsg("");
+    const res = await fetch("/api/applications/resend", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ trackingCode: enquiry.trackingCode, email: resendEmail }),
+    });
+    setResendMsg(
+      res.ok
+        ? "If that email matches this enquiry, we've sent your application link. Check your inbox (and spam)."
+        : "Please enter the email you used for this enquiry."
+    );
+  };
+  const returnedPaid = searchParams.get("paid") === "1";
+  const returnedCancelled = searchParams.get("cancelled") === "1";
+
+  const startPayment = async () => {
+    if (!enquiry) return;
+    setPaying(true);
+    setPayError("");
     try {
-      const res = await fetch(`/api/enquiries/track?code=${encodeURIComponent(trackingCode.trim())}`);
+      const res = await fetch("/api/payments/checkout", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ trackingCode: enquiry.trackingCode }),
+      });
+      const data = await res.json();
+      if (data.needsDetails) setNeedsDetails(true);
+      if (!res.ok || !data.url) {
+        setPayError(data.error ?? "Could not start payment. Please try again.");
+        setPaying(false);
+        return;
+      }
+      window.location.assign(data.url);
+    } catch {
+      setPayError("Could not start payment. Please try again.");
+      setPaying(false);
+    }
+  };
+
+  const lookup = async (trackingCode: string, silent = false) => {
+    if (!trackingCode.trim()) return;
+    if (!silent) {
+      setState("loading");
+      setEnquiry(null);
+    }
+    try {
+      const res = await fetch(`/api/enquiries/track?code=${encodeURIComponent(trackingCode.trim())}${returnedPaid ? "&paid=1" : ""}`);
       const data = await res.json();
       if (!res.ok) {
         setErrorMessage(data.error ?? "Something went wrong.");
@@ -59,6 +112,19 @@ function TrackForm() {
     if (initial) lookup(initial);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  // After returning from Stripe the webhook may lag a moment: poll briefly until payment shows as paid.
+  useEffect(() => {
+    if (!returnedPaid || !enquiry || enquiry.paymentStatus !== "unpaid") return;
+    let tries = 0;
+    const timer = setInterval(() => {
+      tries += 1;
+      if (tries > 8) return clearInterval(timer);
+      lookup(enquiry.trackingCode, true);
+    }, 2500);
+    return () => clearInterval(timer);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [returnedPaid, enquiry?.trackingCode, enquiry?.paymentStatus]);
 
   const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -145,9 +211,13 @@ function TrackForm() {
                 <dd className="font-medium text-gray-900">{enquiry.visaType}</dd>
               </div>
               <div className="flex justify-between">
+                <dt className="text-gray-500">Processing</dt>
+                <dd className="font-medium text-gray-900 capitalize">{enquiry.processing}</dd>
+              </div>
+              <div className="flex justify-between">
                 <dt className="text-gray-500">Travel Date</dt>
                 <dd className="font-medium text-gray-900">
-                  {new Intl.DateTimeFormat("en-US", { dateStyle: "medium", timeStyle: "short" }).format(new Date(enquiry.travelDate))}
+                  {new Intl.DateTimeFormat("en-GB", { dateStyle: "medium", timeZone: "UTC" }).format(new Date(enquiry.travelDate))}
                 </dd>
               </div>
               <div className="flex justify-between">
@@ -161,6 +231,65 @@ function TrackForm() {
                 </dd>
               </div>
             </dl>
+
+            <div className="mt-6 pt-5 border-t border-gray-200">
+              <div className="flex items-center justify-between mb-3">
+                <span className="text-sm text-gray-500">Payment · £{(enquiry.amountPence / 100).toFixed(2)}</span>
+                <span
+                  className={`inline-block rounded-full px-3 py-1 text-xs font-medium ${
+                    enquiry.paymentStatus === "paid"
+                      ? "bg-green-100 text-green-700"
+                      : enquiry.paymentStatus === "refunded"
+                        ? "bg-gray-200 text-gray-700"
+                        : "bg-amber-100 text-amber-700"
+                  }`}
+                >
+                  {enquiry.paymentStatus === "paid" ? "Paid" : enquiry.paymentStatus === "refunded" ? "Refunded" : "Awaiting payment"}
+                </span>
+              </div>
+
+              {enquiry.paymentStatus === "paid" && returnedPaid && (
+                <p className="text-sm text-green-700">Thank you — your payment was received. A receipt is on its way to your email.</p>
+              )}
+              {enquiry.paymentStatus === "unpaid" && returnedPaid && (
+                <p className="text-sm text-gray-600 mb-3">Confirming your payment… this page will update automatically.</p>
+              )}
+              {enquiry.paymentStatus === "unpaid" && returnedCancelled && !returnedPaid && (
+                <p className="text-sm text-gray-600 mb-3">Payment was cancelled. Your enquiry is saved — you can pay whenever you&apos;re ready.</p>
+              )}
+              {enquiry.paymentStatus === "unpaid" && (!enquiry.detailsCompletedAt || needsDetails) && (
+                <div className="mb-3 rounded-xl bg-amber-50 border border-amber-200 p-4 text-sm text-gray-700">
+                  <p className="mb-3">
+                    Passport details for every traveller are needed before payment. Enter the email you used and we&apos;ll
+                    re-send your private application link.
+                  </p>
+                  <div className="flex flex-col sm:flex-row gap-2">
+                    <input
+                      type="email"
+                      value={resendEmail}
+                      onChange={(e) => setResendEmail(e.target.value)}
+                      placeholder="you@example.com"
+                      className="flex-1 rounded-xl border border-gray-200 bg-white px-4 py-2.5 text-sm outline-none"
+                    />
+                    <button type="button" onClick={resendLink} className="rounded-xl bg-gray-900 text-white px-5 py-2.5 text-sm font-medium hover:bg-gray-800 transition">
+                      Email me the link
+                    </button>
+                  </div>
+                  {resendMsg && <p className="mt-3 text-gray-600">{resendMsg}</p>}
+                </div>
+              )}
+              {enquiry.paymentStatus === "unpaid" && enquiry.detailsCompletedAt && (
+                <button
+                  type="button"
+                  onClick={startPayment}
+                  disabled={paying}
+                  className="w-full bg-brand-red text-white rounded-[1.25rem] font-medium hover:bg-[#8A2728] transition py-3.5 text-[14px] disabled:opacity-60"
+                >
+                  {paying ? "Redirecting..." : `Pay £${(enquiry.amountPence / 100).toFixed(2)} now`}
+                </button>
+              )}
+              {payError && <p className="text-sm font-medium text-red-700 mt-3">{payError}</p>}
+            </div>
           </div>
         )}
       </div>

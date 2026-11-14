@@ -1,6 +1,7 @@
 import Image from "next/image";
 import ScrollAnimations from "../components/ScrollAnimations";
 import MobileMenu from "../components/MobileMenu";
+import PricingSection from "../components/PricingSection";
 
 export default function ServicesPage() {
   return (
@@ -175,6 +176,8 @@ export default function ServicesPage() {
           </div>
         </div>
       </section>
+
+      <PricingSection />
 
       {/* Aesthetic Marquee Divider */}
       <section className="w-full bg-[#A33132] py-10 md:py-16 overflow-hidden flex flex-col justify-center shadow-inner">

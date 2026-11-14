@@ -133,7 +133,7 @@ export default async function AdminPage({
 
   return (
     <div className="min-h-screen bg-[#F9F9F7] px-4 py-10 lg:px-10">
-      <div className="max-w-6xl mx-auto">
+      <div className="max-w-7xl mx-auto">
         <div className="flex items-center justify-between mb-8">
           <div>
             <p className="text-brand-red text-[11px] font-bold tracking-widest uppercase mb-2">Booking Enquiry</p>
@@ -212,63 +212,101 @@ export default async function AdminPage({
         </form>
 
         <div className="bg-white rounded-[1.5rem] shadow-[0_20px_60px_rgb(0,0,0,0.04)] overflow-hidden">
-          <div className="overflow-x-auto">
-            <table className="w-full text-sm">
-              <thead>
-                <tr className="border-b border-gray-100 text-left text-[10px] font-bold text-gray-500 uppercase tracking-widest">
-                  <th className="px-5 py-4">Name</th>
-                  <th className="px-5 py-4">Email</th>
-                  <th className="px-5 py-4">Visa Type</th>
-                  <th className="px-5 py-4">Travel Date</th>
-                  <th className="px-5 py-4">Travellers</th>
-                  <th className="px-5 py-4">Source</th>
-                  <th className="px-5 py-4">Status</th>
-                  <th className="px-5 py-4">Submitted</th>
-                  <th className="px-5 py-4"></th>
-                </tr>
-              </thead>
-              <tbody>
-                {enquiries.map((enquiry) => (
-                  <tr key={enquiry.id} className="border-b border-gray-50 last:border-0">
-                    <td className="px-5 py-4 font-medium text-gray-900">{enquiry.fullName}</td>
-                    <td className="px-5 py-4 text-gray-600">{enquiry.email}</td>
-                    <td className="px-5 py-4 text-gray-600">{enquiry.visaType}</td>
-                    <td className="px-5 py-4 text-gray-600">
-                      {new Intl.DateTimeFormat("en-US", {
-                        dateStyle: "medium",
-                        timeStyle: "short",
-                      }).format(enquiry.travelDate)}
-                    </td>
-                    <td className="px-5 py-4 text-gray-600">{enquiry.travellers}</td>
-                    <td className="px-5 py-4 text-gray-600 capitalize">{enquiry.source}</td>
-                    <td className="px-5 py-4">
-                      <StatusSelect
-                        id={enquiry.id}
-                        currentStatus={enquiry.status}
-                        className={STATUS_STYLES[enquiry.status]}
-                      />
-                    </td>
-                    <td className="px-5 py-4 text-gray-400 whitespace-nowrap">
-                      {new Intl.DateTimeFormat("en-US", {
-                        dateStyle: "medium",
-                        timeStyle: "short",
-                      }).format(enquiry.createdAt)}
-                    </td>
-                    <td className="px-5 py-4">
-                      <DeleteButton id={enquiry.id} fullName={enquiry.fullName} />
-                    </td>
-                  </tr>
-                ))}
-                {enquiries.length === 0 && (
-                  <tr>
-                    <td colSpan={9} className="px-5 py-10 text-center text-gray-400">
-                      No enquiries found.
-                    </td>
-                  </tr>
-                )}
-              </tbody>
-            </table>
+          {/* Column headers (desktop) */}
+          <div className="hidden lg:grid grid-cols-[1.6fr_1.4fr_1fr_0.9fr_0.9fr_auto] gap-6 px-8 py-4 border-b border-gray-100 text-[10px] font-bold text-gray-500 uppercase tracking-widest">
+            <span>Customer</span>
+            <span>Trip</span>
+            <span>Payment</span>
+            <span>Status</span>
+            <span>Submitted</span>
+            <span className="w-9" />
           </div>
+
+          <ul className="divide-y divide-gray-100">
+            {enquiries.map((enquiry) => {
+              const payStyle =
+                enquiry.paymentStatus === "paid"
+                  ? "bg-green-100 text-green-700"
+                  : enquiry.paymentStatus === "refunded"
+                    ? "bg-gray-200 text-gray-700"
+                    : "bg-amber-100 text-amber-700";
+              const payLabel =
+                enquiry.paymentStatus === "paid" ? "Paid" : enquiry.paymentStatus === "refunded" ? "Refunded" : "Unpaid";
+              return (
+                <li
+                  key={enquiry.id}
+                  className="grid grid-cols-1 lg:grid-cols-[1.6fr_1.4fr_1fr_0.9fr_0.9fr_auto] gap-x-6 gap-y-4 px-6 lg:px-8 py-6 items-center hover:bg-[#FBFAF8] transition"
+                >
+                  <div className="min-w-0">
+                    <a href={`/admin/enquiries/${enquiry.id}`} className="block font-semibold text-gray-900 hover:text-brand-red truncate">{enquiry.fullName}</a>
+                    <a href={`mailto:${enquiry.email}`} className="block text-sm text-gray-500 hover:text-brand-red truncate">
+                      {enquiry.email}
+                    </a>
+                    <p className="mt-1 font-mono text-xs font-bold tracking-wider text-brand-red">{enquiry.trackingCode}</p>
+                  </div>
+
+                  <div className="text-sm space-y-1">
+                    <p className="font-medium text-gray-900">{enquiry.visaType}</p>
+                    <p className="text-gray-500">
+                      <span className="capitalize">{enquiry.processing}</span> processing · {enquiry.travellers}{" "}
+                      {enquiry.travellers === 1 ? "traveller" : "travellers"}
+                    </p>
+                    <p className="text-gray-500">
+                      Travel{" "}
+                      {new Intl.DateTimeFormat("en-GB", { dateStyle: "medium", timeStyle: "short", timeZone: "UTC" }).format(
+                        enquiry.travelDate
+                      )}
+                    </p>
+                  </div>
+
+                  <div>
+                    <p className="font-playfair text-xl text-gray-900">£{(enquiry.amountPence / 100).toFixed(2)}</p>
+                    <span className={`mt-1 inline-block rounded-full px-3 py-1 text-xs font-medium ${payStyle}`}>{payLabel}</span>
+                  </div>
+
+                  <div className="flex items-center gap-2">
+                    <StatusSelect
+                      id={enquiry.id}
+                      currentStatus={enquiry.status}
+                      className={STATUS_STYLES[enquiry.status]}
+                    />
+                  </div>
+
+                  <div className="text-sm text-gray-500">
+                    <p>
+                      {new Intl.DateTimeFormat("en-GB", { dateStyle: "medium" }).format(enquiry.createdAt)}
+                    </p>
+                    <p className="text-gray-400">
+                      {new Intl.DateTimeFormat("en-GB", { timeStyle: "short" }).format(enquiry.createdAt)} ·{" "}
+                      <span className="capitalize">{enquiry.source}</span>
+                    </p>
+                    {enquiry.detailsCompletedAt ? (
+                      <a
+                        href={`/admin/enquiries/${enquiry.id}`}
+                        className="mt-3 inline-flex items-center gap-2 rounded-full bg-brand-red px-4 py-2 text-xs font-bold uppercase tracking-wider text-white shadow-sm transition hover:bg-[#8A2728]"
+                      >
+                        View details
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+                          <path d="M5 12h14M13 6l6 6-6 6" />
+                        </svg>
+                      </a>
+                    ) : (
+                      <span className="mt-3 inline-flex items-center rounded-full border border-dashed border-gray-300 px-4 py-2 text-xs font-semibold text-gray-400">
+                        Details not submitted
+                      </span>
+                    )}
+                  </div>
+
+                  <div className="lg:justify-self-end">
+                    <DeleteButton id={enquiry.id} fullName={enquiry.fullName} />
+                  </div>
+                </li>
+              );
+            })}
+            {enquiries.length === 0 && (
+              <li className="px-5 py-14 text-center text-gray-400">No enquiries found.</li>
+            )}
+          </ul>
         </div>
 
         {total > 0 && (

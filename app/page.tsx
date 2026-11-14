@@ -2,6 +2,7 @@ import Image from "next/image";
 import ScrollAnimations from "./components/ScrollAnimations";
 import FAQAccordion from "./components/FAQAccordion";
 import DocumentsAccordion from "./components/DocumentsAccordion";
+import PricingSection from "./components/PricingSection";
 import BookingEnquiryForm from "./components/BookingEnquiryForm";
 import MobileMenu from "./components/MobileMenu";
 
@@ -341,6 +342,8 @@ export default function Home() {
           </div>
         </div>
       </section>
+
+      <PricingSection />
 
       {/* Why Choose Us Section */}
       <section data-anim-section="why-choose" className="relative w-full bg-white pt-32 pb-40 px-6 md:px-12 overflow-hidden">

@@ -17,6 +17,12 @@ enum EnquiryStatus {
   closed
 }
 
+enum PaymentStatus {
+  unpaid
+  paid
+  refunded
+}
+
 model Enquiry {
   id            String        @id @default(cuid())
   trackingCode  String        @unique
@@ -25,11 +31,71 @@ model Enquiry {
   visaType      String
   travelDate    DateTime
   travellers    Int
+  processing    String        @default("standard")
   source        EnquirySource
   status        EnquiryStatus @default(new)
+  paymentStatus PaymentStatus @default(unpaid)
+  amountPence   Int           @default(0)
+  stripeSessionId       String? @unique
+  stripePaymentIntentId String?
+  paidAt        DateTime?
+  accessToken   String        @unique
+  detailsCompletedAt DateTime?
+  travellerDetails   Traveller[]
   createdAt     DateTime      @default(now())
   updatedAt     DateTime      @updatedAt
 
   @@index([status])
+  @@index([paymentStatus])
+  @@index([stripePaymentIntentId])
   @@index([createdAt])
+}
+
+model Traveller {
+  id        String  @id @default(cuid())
+  enquiryId String
+  enquiry   Enquiry @relation(fields: [enquiryId], references: [id], onDelete: Cascade)
+  position  Int
+
+  // Eligibility
+  nationality         String
+  countryOfResidence  String
+  dateOfBirth         DateTime
+  documentType        String
+  purposeOfTrip       String
+  hasOtherVisa        Boolean
+  conditionsAcceptedAt DateTime
+
+  // Personal information
+  familyName     String
+  firstName      String
+  placeOfBirth   String
+  phone          String
+  email          String
+  occupation     String
+  passportNumber String
+  issuedBy       String
+  dateOfIssue    DateTime
+  expiryDate     DateTime
+
+  // Further information
+  additionalVisaType    String?
+  additionalVisaFrom    DateTime?
+  additionalVisaUntil   DateTime?
+  additionalVisaEntries String?
+  additionalVisaNumber  String?
+  arrivalDate           DateTime
+  departureDate         DateTime
+  ukShareCode           String?
+
+  // Attachments (private file paths)
+  photoPath          String
+  passportPath       String
+  additionalVisaPath String?
+  eVisaPath          String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([enquiryId, position])
 }

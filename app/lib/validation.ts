@@ -1,11 +1,9 @@
 import { z } from "zod";
-import { VISA_TYPES } from "@/app/lib/constants";
+import { PROCESSING_OPTIONS } from "@/app/lib/constants";
 
 export const enquirySchema = z.object({
-  fullName: z.string().trim().min(1).max(200),
   email: z.email().trim(),
-  visaType: z.enum(VISA_TYPES),
-  travelDate: z.coerce.date(),
+  processing: z.enum(PROCESSING_OPTIONS.map((o) => o.value) as [string, ...string[]]),
   travellers: z.coerce.number().int().min(1).max(20),
   source: z.enum(["homepage", "contact"]),
 });
