@@ -7,7 +7,11 @@ import path from "path";
 export const UPLOAD_ROOT = path.resolve(process.env.UPLOAD_DIR || path.join(process.cwd(), "private-uploads"));
 export const MAX_UPLOAD_BYTES = 5 * 1024 * 1024;
 
-export class UploadError extends Error {}
+export class UploadError extends Error {
+  constructor(message: string, public field?: string) {
+    super(message);
+  }
+}
 
 function detectExtension(buf: Buffer): string | null {
   if (buf.length >= 3 && buf[0] === 0xff && buf[1] === 0xd8 && buf[2] === 0xff) return "jpg";
@@ -25,12 +29,14 @@ export async function saveUpload(
   file: File,
   opts: { imagesOnly?: boolean } = {}
 ): Promise<string> {
-  if (file.size === 0) throw new UploadError("The uploaded file is empty.");
-  if (file.size > MAX_UPLOAD_BYTES) throw new UploadError("Each file must be 5MB or smaller.");
+  const field = kind === "evisa" ? "eVisa" : kind === "additional" ? "additionalVisa" : kind;
+  const mb = (file.size / 1024 / 1024).toFixed(1);
+  if (file.size === 0) throw new UploadError(`"${file.name}" is empty. Please choose a different file.`, field);
+  if (file.size > MAX_UPLOAD_BYTES) throw new UploadError(`"${file.name}" is ${mb} MB — the maximum is 5 MB. Please compress or resize it.`, field);
   const buf = Buffer.from(await file.arrayBuffer());
   const ext = detectExtension(buf);
-  if (!ext) throw new UploadError("Files must be JPG, PNG, WebP or PDF.");
-  if (opts.imagesOnly && ext === "pdf") throw new UploadError("The photo must be a JPG, PNG or WebP image.");
+  if (!ext) throw new UploadError(`"${file.name}" is not a supported file type. Please upload a JPG, PNG, WebP or PDF.`, field);
+  if (opts.imagesOnly && ext === "pdf") throw new UploadError(`"${file.name}" is a PDF — the photo must be a JPG, PNG or WebP image.`, field);
 
   const rel = path.join(enquiryId, `${position}-${kind}-${crypto.randomBytes(8).toString("hex")}.${ext}`);
   const full = path.join(UPLOAD_ROOT, rel);

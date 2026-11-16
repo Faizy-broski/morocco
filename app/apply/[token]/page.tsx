@@ -43,6 +43,7 @@ export default async function ApplyPage({ params }: { params: Promise<{ token: s
     <ApplicationForm
       token={token}
       saved={toSavedTravellers(enquiry.travellerDetails)}
+      drafts={(enquiry.draft as Record<string, Record<string, string>> | null) ?? {}}
       initialEnquiry={{
         email: enquiry.email,
         processing: enquiry.processing as ProcessingValue,

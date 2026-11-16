@@ -18,6 +18,7 @@ type SearchParams = {
   status?: string;
   visaType?: string;
   page?: string;
+  tab?: string;
 };
 
 export default async function AdminPage({
@@ -31,15 +32,19 @@ export default async function AdminPage({
   const status = params.status && params.status !== "all" ? params.status : undefined;
   const visaType = params.visaType && params.visaType !== "all" ? params.visaType : undefined;
   const page = Math.max(1, Number(params.page) || 1);
+  const tab = params.tab === "paid" || params.tab === "abandoned" ? params.tab : "all";
 
   const where = {
     ...(status ? { status: status as "new" | "contacted" | "closed" } : {}),
     ...(visaType ? { visaType } : {}),
+    ...(tab === "paid" ? { paymentStatus: "paid" as const } : {}),
+    ...(tab === "abandoned" ? { paymentStatus: "unpaid" as const, abandonedAt: { not: null } } : {}),
   };
 
-  const [enquiries, total, totalCount, newCount, contactedCount, closedCount] = await Promise.all([
+  const [enquiries, total, totalCount, newCount, contactedCount, closedCount, paidCount, abandonedCount] = await Promise.all([
     prisma.enquiry.findMany({
       where,
+      include: { travellerDetails: { select: { position: true, firstName: true, familyName: true, phone: true } } },
       orderBy: { createdAt: "desc" },
       skip: (page - 1) * PAGE_SIZE,
       take: PAGE_SIZE,
@@ -49,6 +54,8 @@ export default async function AdminPage({
     prisma.enquiry.count({ where: { status: "new" } }),
     prisma.enquiry.count({ where: { status: "contacted" } }),
     prisma.enquiry.count({ where: { status: "closed" } }),
+    prisma.enquiry.count({ where: { paymentStatus: "paid" } }),
+    prisma.enquiry.count({ where: { paymentStatus: "unpaid", abandonedAt: { not: null } } }),
   ]);
 
   const totalPages = Math.max(1, Math.ceil(total / PAGE_SIZE));
@@ -59,6 +66,7 @@ export default async function AdminPage({
     const sp = new URLSearchParams();
     if (status) sp.set("status", status);
     if (visaType) sp.set("visaType", visaType);
+    if (tab !== "all") sp.set("tab", tab);
     sp.set("page", String(targetPage));
     return `/admin?${sp.toString()}`;
   };
@@ -174,7 +182,31 @@ export default async function AdminPage({
           ))}
         </div>
 
+        <nav className="mb-6 flex flex-wrap gap-2" aria-label="Enquiry views">
+          {(
+            [
+              ["all", "All", totalCount],
+              ["paid", "Paid", paidCount],
+              ["abandoned", "Abandoned", abandonedCount],
+            ] as const
+          ).map(([key, label, count]) => (
+            <a
+              key={key}
+              href={key === "all" ? "/admin" : `/admin?tab=${key}`}
+              className={`rounded-full px-5 py-2.5 text-sm font-semibold transition ${
+                tab === key ? "bg-brand-red text-white shadow" : "bg-white text-gray-700 hover:bg-gray-50"
+              }`}
+            >
+              {label}
+              <span className={`ml-2 rounded-full px-2 py-0.5 text-xs ${tab === key ? "bg-white/20" : key === "abandoned" && count > 0 ? "bg-red-100 text-red-700" : "bg-gray-100 text-gray-500"}`}>
+                {count}
+              </span>
+            </a>
+          ))}
+        </nav>
+
         <form className="bg-white rounded-[1.5rem] shadow-[0_20px_60px_rgb(0,0,0,0.04)] p-5 mb-6 flex flex-wrap gap-4 items-end">
+          <input type="hidden" name="tab" value={tab} />
           <div className="flex flex-col gap-1.5">
             <label className="text-[10px] font-bold text-gray-500 uppercase tracking-widest">Status</label>
             <select
@@ -243,6 +275,19 @@ export default async function AdminPage({
                       {enquiry.email}
                     </a>
                     <p className="mt-1 font-mono text-xs font-bold tracking-wider text-brand-red">{enquiry.trackingCode}</p>
+                    {tab === "abandoned" && (
+                      <div className="mt-2 flex flex-wrap items-center gap-2 text-xs">
+                        <span className={`rounded-full px-2.5 py-1 font-semibold ${enquiry.lastError ? "bg-red-100 text-red-700" : "bg-amber-100 text-amber-800"}`}>
+                          {enquiry.lastError ? "Technical problem" : "Didn't pay"}
+                        </span>
+                        <span className="text-gray-500">
+                          {enquiry.travellerDetails.length}/{enquiry.travellers} saved
+                        </span>
+                        <a href={`mailto:${enquiry.email}?subject=Your Morocco visa application ${enquiry.trackingCode}`} className="font-semibold text-brand-red hover:underline">
+                          Email →
+                        </a>
+                      </div>
+                    )}
                   </div>
 
                   <div className="text-sm space-y-1">
@@ -280,19 +325,19 @@ export default async function AdminPage({
                       {new Intl.DateTimeFormat("en-GB", { timeStyle: "short" }).format(enquiry.createdAt)} ·{" "}
                       <span className="capitalize">{enquiry.source}</span>
                     </p>
-                    {enquiry.detailsCompletedAt ? (
+                    {enquiry.travellerDetails.length > 0 || enquiry.draft ? (
                       <a
                         href={`/admin/enquiries/${enquiry.id}`}
                         className="mt-3 inline-flex items-center gap-2 rounded-full bg-brand-red px-4 py-2 text-xs font-bold uppercase tracking-wider text-white shadow-sm transition hover:bg-[#8A2728]"
                       >
-                        View details
+                        {enquiry.detailsCompletedAt ? "View details" : "View partial details"}
                         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
                           <path d="M5 12h14M13 6l6 6-6 6" />
                         </svg>
                       </a>
                     ) : (
                       <span className="mt-3 inline-flex items-center rounded-full border border-dashed border-gray-300 px-4 py-2 text-xs font-semibold text-gray-400">
-                        Details not submitted
+                        Nothing entered yet
                       </span>
                     )}
                   </div>

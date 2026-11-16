@@ -275,3 +275,100 @@ export async function sendPaymentConfirmation(enquiry: Enquiry, travellers: Trav
   ]);
   logFailures(results);
 }
+
+/* ---------------- abandoned leads ---------------- */
+
+const progressText = (e: Enquiry, travellers: Traveller[]) => `${travellers.length} of ${e.travellers} traveller${e.travellers === 1 ? "" : "s"} saved`;
+
+/** Admin: a technical problem stopped an application (immediate alert). */
+export async function sendFailureAlert(enquiry: Enquiry, travellers: Traveller[], error: string) {
+  const transporter = getTransporter();
+  if (!transporter) return;
+  const lead = travellers[0];
+  const results = await Promise.allSettled([
+    transporter.sendMail({
+      from: FROM,
+      to: ADMIN_TO(),
+      replyTo: enquiry.email,
+      subject: `Application problem — potential lead: ${enquiry.email} (${enquiry.trackingCode})`,
+      html: layout({
+        admin: true,
+        preheader: `A customer hit a problem: ${error}`,
+        heading: "A customer hit a problem",
+        intro: "This application didn't go through. It's been added to the Abandoned tab as a potential lead.",
+        body: `
+          <p style="margin:0 0 18px">${pill("Needs follow-up", "#fee2e2", "#991b1b")}</p>
+          ${rows([
+            ["Problem", esc(error)],
+            ["Contact email", esc(enquiry.email)],
+            ["Phone", esc(lead?.phone ?? "—")],
+            ["Name", esc(lead ? `${lead.firstName} ${lead.familyName}` : "Not entered yet")],
+            ["Progress", esc(progressText(enquiry, travellers))],
+            ["Amount", gbp(enquiry.amountPence)],
+            ["Tracking code", esc(enquiry.trackingCode)],
+          ])}
+          <p style="margin:26px 0 0;text-align:center">${button(`${SITE_URL}/admin/enquiries/${enquiry.id}`, "Open in admin")}</p>`,
+      }),
+    }),
+  ]);
+  logFailures(results);
+}
+
+/** Admin: hourly digest of applications that never reached payment. */
+export async function sendAbandonedDigest(items: { enquiry: Enquiry; travellers: Traveller[] }[]) {
+  const transporter = getTransporter();
+  if (!transporter || !items.length) return;
+  const list = items
+    .map(({ enquiry: e, travellers }) => {
+      const lead = travellers[0];
+      return `<tr><td style="padding:12px 0;border-top:1px solid #ece9e3">
+        <strong>${esc(lead ? `${lead.firstName} ${lead.familyName}` : "Name not entered")}</strong> · ${gbp(e.amountPence)}<br>
+        <span style="font-size:13px;color:${MUTED}">${esc(e.email)}${lead?.phone ? ` · ${esc(lead.phone)}` : ""}</span><br>
+        <span style="font-size:13px;color:${MUTED}">${esc(progressText(e, travellers))}${e.lastError ? ` · ${esc(e.lastError)}` : ""}</span><br>
+        <a href="${SITE_URL}/admin/enquiries/${e.id}" style="font-size:13px;color:${BRAND}">Open →</a>
+      </td></tr>`;
+    })
+    .join("");
+  const results = await Promise.allSettled([
+    transporter.sendMail({
+      from: FROM,
+      to: ADMIN_TO(),
+      subject: `${items.length} abandoned application${items.length === 1 ? "" : "s"} — potential leads`,
+      html: layout({
+        admin: true,
+        preheader: `${items.length} customers started an application but haven't paid.`,
+        heading: `${items.length} potential lead${items.length === 1 ? "" : "s"} to follow up`,
+        intro: "These customers started an application but haven't paid. We've also sent each of them a reminder with their link.",
+        body: `<table role="presentation" width="100%" cellpadding="0" cellspacing="0">${list}</table>
+          <p style="margin:26px 0 0;text-align:center">${button(`${SITE_URL}/admin?tab=abandoned`, "Open Abandoned tab")}</p>`,
+      }),
+    }),
+  ]);
+  logFailures(results);
+}
+
+/** Customer: one gentle reminder to finish and pay. */
+export async function sendPaymentReminder(enquiry: Enquiry, travellers: Traveller[]) {
+  const transporter = getTransporter();
+  if (!transporter) return;
+  const name = travellers[0]?.firstName;
+  await transporter.sendMail({
+    from: FROM,
+    to: enquiry.email,
+    replyTo: BUSINESS_EMAIL,
+    subject: `Finish your Morocco visa application — ${enquiry.trackingCode}`,
+    html: layout({
+      preheader: "Your application is saved — pick up where you left off.",
+      heading: name ? `${esc(name)}, your application is waiting` : "Your application is waiting",
+      intro: "You started a Morocco visa application but haven't completed payment. Everything you entered is saved.",
+      body: `
+        ${codeBox(enquiry.trackingCode)}
+        ${rows([
+          ["Progress", esc(progressText(enquiry, travellers))],
+          ["Total", gbp(enquiry.amountPence)],
+        ])}
+        <p style="margin:24px 0 0;text-align:center">${button(`${SITE_URL}/apply/${enquiry.accessToken}`, "Continue my application")}</p>
+        <p style="margin:22px 0 0;font-size:13px;color:${MUTED};text-align:center">Need a hand? Just reply to this email or call ${PHONE}.</p>`,
+    }),
+  });
+}

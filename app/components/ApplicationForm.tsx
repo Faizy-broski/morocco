@@ -27,6 +27,8 @@ type Props = {
   token?: string | null;
   initialEnquiry: EnquiryValues;
   saved?: SavedTraveller[];
+  /** Autosaved in-progress answers per traveller position (from the server). */
+  drafts?: Record<string, Record<string, string>>;
   embedded?: boolean;
   source?: "homepage" | "contact";
 };
@@ -39,6 +41,22 @@ const RED = "#C1272D";
 const MUTED = "#C9B5B5";
 const MAX_BYTES = 5 * 1024 * 1024;
 const RESUME_KEY = "mv_application_token";
+const MAX_TOTAL_BYTES = 14 * 1024 * 1024; // stays below the 15 MB server limit
+
+/** Returns a plain-English problem with a chosen file, or "" if it is fine. */
+function fileProblem(f: File | undefined, imagesOnly = false): string {
+  if (!f) return "";
+  const mb = (f.size / 1024 / 1024).toFixed(1);
+  if (f.size === 0) return `"${f.name}" is empty. Please choose a different file.`;
+  if (f.size > MAX_BYTES) return `"${f.name}" is ${mb} MB — the maximum is 5 MB. Please compress or resize it.`;
+  const okType = /^(image\/(jpeg|png|webp)|application\/pdf)$/.test(f.type);
+  if (!okType) {
+    const ext = f.name.includes(".") ? f.name.split(".").pop()!.toUpperCase() : "this type of";
+    return `"${f.name}" can't be used — ${ext} files aren't supported. Please upload a JPG, PNG, WebP or PDF.`;
+  }
+  if (imagesOnly && f.type === "application/pdf") return `"${f.name}" is a PDF — the photo must be a JPG, PNG or WebP image.`;
+  return "";
+}
 
 const STEPS = [
   { label: "Eligibility", icon: "M12 3l8 3v6c0 5-3.5 8-8 9-4.5-1-8-4-8-9V6zM9 12l2 2 4-4" },
@@ -63,7 +81,7 @@ const splitPhone = (phone: string) => {
   return m ? { dial: m[1], number: m[2] } : { dial: "+44", number: phone };
 };
 
-function newDraft(n: number, enq: EnquiryValues, saved?: SavedTraveller): Draft {
+function newDraft(n: number, enq: EnquiryValues, saved?: SavedTraveller, auto?: Record<string, string>): Draft {
   if (saved) {
     const ph = splitPhone(saved.values.phone ?? "");
     return {
@@ -71,6 +89,15 @@ function newDraft(n: number, enq: EnquiryValues, saved?: SavedTraveller): Draft 
       conditions: TRAVEL_CONDITIONS.map(() => true),
       files: {},
       has: saved.hasFiles,
+    };
+  }
+  if (auto) {
+    const { conditionsAccepted, ...values } = auto;
+    return {
+      values: { _dial: "+44", ...values },
+      conditions: TRAVEL_CONDITIONS.map(() => conditionsAccepted === "true"),
+      files: {},
+      has: {},
     };
   }
   return {
@@ -160,6 +187,7 @@ export default function ApplicationForm({
   token: initialToken = null,
   initialEnquiry,
   saved = [],
+  drafts: initialDrafts = {},
   embedded,
   source = "contact",
 }: Props) {
@@ -180,9 +208,12 @@ export default function ApplicationForm({
     email: initialEnquiry.email,
   });
   const [serverSaved, setServerSaved] = useState<Set<number>>(new Set(saved.map((x) => x.position)));
-  const [drafts, setDrafts] = useState<Record<number, Draft>>(() =>
-    Object.fromEntries(saved.map((s) => [s.position, newDraft(s.position, initialEnquiry, s)]))
-  );
+  const [drafts, setDrafts] = useState<Record<number, Draft>>(() => {
+    const out: Record<number, Draft> = {};
+    for (const [k, vals] of Object.entries(initialDrafts)) out[Number(k)] = newDraft(Number(k), initialEnquiry, undefined, vals);
+    for (const sv of saved) out[sv.position] = newDraft(sv.position, initialEnquiry, sv);
+    return out;
+  });
   const [errs, setErrs] = useState<Record<string, string>>({});
   const [banner, setBanner] = useState("");
   const [busy, setBusy] = useState(false);
@@ -205,12 +236,15 @@ export default function ApplicationForm({
           localStorage.removeItem(RESUME_KEY); // paid or no longer exists
           return;
         }
-        const data = (await res.json()) as { enquiry: EnquiryValues; saved: SavedTraveller[] };
+        const data = (await res.json()) as { enquiry: EnquiryValues; saved: SavedTraveller[]; drafts?: Record<string, Record<string, string>> };
         if (cancelled || tokenRef.current) return;
         tokenRef.current = token;
         serverRef.current = { travellers: data.enquiry.travellers, processing: data.enquiry.processing, email: data.enquiry.email };
         setEnq(data.enquiry);
-        setDrafts(Object.fromEntries(data.saved.map((x) => [x.position, newDraft(x.position, data.enquiry, x)])));
+        const restored: Record<number, Draft> = {};
+        for (const [k, vals] of Object.entries(data.drafts ?? {})) restored[Number(k)] = newDraft(Number(k), data.enquiry, undefined, vals);
+        for (const x of data.saved) restored[x.position] = newDraft(x.position, data.enquiry, x);
+        setDrafts(restored);
         setServerSaved(new Set(data.saved.map((x) => x.position)));
         const done = new Set(data.saved.map((x) => x.position));
         let next = data.enquiry.travellers;
@@ -221,8 +255,9 @@ export default function ApplicationForm({
           }
         }
         setIdx(next);
-        setStep(done.has(next) ? 6 : 2);
-        if (data.saved.length) setBanner("Welcome back — we've restored the details you already saved.");
+        const savedStep = Number(data.drafts?.[String(next)]?._step);
+        setStep(done.has(next) ? 6 : savedStep >= 2 && savedStep <= 6 ? savedStep : 2);
+        if (data.saved.length || Object.keys(data.drafts ?? {}).length) setBanner("Welcome back — we've restored what you had already entered.");
       } catch {
         // offline: start fresh
       }
@@ -258,7 +293,34 @@ export default function ApplicationForm({
       conditions[i] = checked;
       return { ...d, conditions };
     });
-  const setFile = (kind: keyof Files, file?: File) => mutate((d) => ({ ...d, files: { ...d.files, [kind]: file } }));
+  const setFile = (kind: keyof Files, file?: File) => {
+    const problem = fileProblem(file, kind === "photo");
+    if (problem) {
+      // Don't keep a file we already know will be rejected.
+      setErrs((p) => ({ ...p, [kind]: problem }));
+      setBanner("One of your files can't be used — see the message under it.");
+      reportEvent(`File rejected in browser (${kind}): ${problem}`);
+      return;
+    }
+    setErrs((p) => {
+      const { [kind]: _removed, ...rest } = p;
+      void _removed;
+      return rest;
+    });
+    setBanner("");
+    mutate((d) => ({ ...d, files: { ...d.files, [kind]: file } }));
+  };
+
+  /** Tell the server about a problem only the browser can see, so it shows up as a lead. */
+  const reportEvent = (reason: string) => {
+    if (!tokenRef.current) return;
+    fetch(`/api/applications/${tokenRef.current}/event`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ reason }),
+      keepalive: true,
+    }).catch(() => {});
+  };
 
   /* ---------- validation (client side; the server re-validates everything) ---------- */
   const validate = (s: number): Record<string, string> => {
@@ -302,13 +364,7 @@ export default function ApplicationForm({
       if (code && !/^[A-Za-z0-9]{9}$/.test(code)) e.ukShareCode = "A UK share code is 9 letters/numbers, e.g. W12 3AB 4CD";
     }
     if (s === 6) {
-      const bad = (f?: File, imagesOnly = false) => {
-        if (!f) return "";
-        if (f.size > MAX_BYTES) return "File must be 5MB or smaller.";
-        if (!/^(image\/(jpeg|png|webp)|application\/pdf)$/.test(f.type)) return "Use JPG, PNG, WebP or PDF.";
-        if (imagesOnly && f.type === "application/pdf") return "The photo must be an image.";
-        return "";
-      };
+      const bad = fileProblem;
       if (!draft.files.photo && !draft.has.photo) e.photo = "Required";
       else if (bad(draft.files.photo, true)) e.photo = bad(draft.files.photo, true);
       if (!draft.files.passport && !draft.has.passport) e.passport = "Required";
@@ -316,20 +372,81 @@ export default function ApplicationForm({
       if (hasOther && !draft.files.additionalVisa && !draft.has.additionalVisa) e.additionalVisa = "Required";
       else if (bad(draft.files.additionalVisa)) e.additionalVisa = bad(draft.files.additionalVisa);
       if (bad(draft.files.eVisa)) e.eVisa = bad(draft.files.eVisa);
+      const total = Object.values(draft.files).reduce((n, f) => n + (f?.size ?? 0), 0);
+      if (total > MAX_TOTAL_BYTES && !Object.keys(e).length) {
+        e.passport = `Your files add up to ${(total / 1024 / 1024).toFixed(1)} MB — the combined limit is 14 MB. Please compress some of them.`;
+      }
     }
     return e;
   };
 
   /* ---------- navigation ---------- */
+  /** Creates the application on the server the first time we know the contact email, or syncs changes. */
+  const ensureApplication = async (contactEmail: string) => {
+    const srv = serverRef.current;
+    if (!tokenRef.current) {
+      const r = await fetch("/api/enquiries", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email: contactEmail, processing: enq.processing, travellers: N, source }),
+      });
+      const d = await r.json().catch(() => ({}));
+      if (!r.ok) throw new Error(d.error ?? "Could not start your application. Please check your details and try again.");
+      tokenRef.current = String(d.applyUrl).split("/").pop()!;
+      try {
+        localStorage.setItem(RESUME_KEY, tokenRef.current);
+      } catch {
+        // storage unavailable: resuming simply won't be offered
+      }
+      serverRef.current = { travellers: N, processing: enq.processing, email: contactEmail };
+    } else if (srv.travellers !== N || srv.processing !== enq.processing || (idx === 1 && srv.email !== contactEmail)) {
+      const r = await fetch(`/api/applications/${tokenRef.current}/enquiry`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email: contactEmail, processing: enq.processing, travellers: N }),
+      });
+      const d = await r.json().catch(() => ({}));
+      if (!r.ok) throw new Error(d.error ?? "Could not update your application. Please try again.");
+      serverRef.current = { travellers: N, processing: enq.processing, email: contactEmail };
+    }
+  };
+
+  /** Autosave this traveller's answers (never blocks the customer; failures are silent). */
+  const autosave = async (nextStep: number) => {
+    try {
+      const contactEmail = idx === 1 ? v.email : serverRef.current.email || enq.email;
+      // Before an email exists there is nothing to attach a draft to.
+      if (!tokenRef.current && !/^\S+@\S+\.\S+$/.test(contactEmail ?? "")) return;
+      await ensureApplication(contactEmail);
+      const allAccepted = TRAVEL_CONDITIONS.every((_, i) => {
+        if (i === CONDITION_TOURISM && !isTourist) return true;
+        if (i === CONDITION_ADDITIONAL_VISA && !hasOther) return true;
+        return draft.conditions[i];
+      });
+      await fetch(`/api/applications/${tokenRef.current}/draft`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          position: idx,
+          values: { ...v, ...(allAccepted ? { conditionsAccepted: "true" } : {}), _step: String(nextStep) },
+        }),
+        keepalive: true,
+      });
+    } catch {
+      // autosave is best-effort
+    }
+  };
+
   const goNext = async () => {
     const e = validate(step);
     setErrs(e);
     setBanner("");
     if (Object.keys(e).length) {
-      setBanner(step === 3 ? e.conditionsAccepted : "Please complete the highlighted fields.");
+      setBanner(step === 3 ? "" : "Please complete the highlighted fields.");
       return;
     }
     if (step < 6) {
+      void autosave(step + 1); // fire and forget: moving on is never delayed
       setStep(step + 1);
       return;
     }
@@ -388,33 +505,7 @@ export default function ApplicationForm({
     try {
       // 1. Make sure the application exists on the server and matches the current choices.
       // The contact email (link + receipt) is traveller 1's email.
-      const contactEmail = idx === 1 ? v.email : serverRef.current.email || enq.email;
-      const srv = serverRef.current;
-      if (!tokenRef.current) {
-        const r = await fetch("/api/enquiries", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ email: contactEmail, processing: enq.processing, travellers: N, source }),
-        });
-        const d = await r.json().catch(() => ({}));
-        if (!r.ok) throw new Error(d.error ?? "Could not start your application. Please check your details and try again.");
-        tokenRef.current = String(d.applyUrl).split("/").pop()!;
-        try {
-          localStorage.setItem(RESUME_KEY, tokenRef.current);
-        } catch {
-          // storage unavailable: resuming simply won't be offered
-        }
-        serverRef.current = { travellers: N, processing: enq.processing, email: contactEmail };
-      } else if (srv.travellers !== N || srv.processing !== enq.processing || (idx === 1 && srv.email !== contactEmail)) {
-        const r = await fetch(`/api/applications/${tokenRef.current}/enquiry`, {
-          method: "PATCH",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ email: contactEmail, processing: enq.processing, travellers: N }),
-        });
-        const d = await r.json().catch(() => ({}));
-        if (!r.ok) throw new Error(d.error ?? "Could not update your application. Please try again.");
-        serverRef.current = { travellers: N, processing: enq.processing, email: contactEmail };
-      }
+      await ensureApplication(idx === 1 ? v.email : serverRef.current.email || enq.email);
 
       // 2. Save this traveller.
       const fd = new FormData();
@@ -426,7 +517,13 @@ export default function ApplicationForm({
       fd.append("conditionsAccepted", "true");
       (Object.entries(draft.files) as [keyof Files, File | undefined][]).forEach(([k, f]) => f && fd.append(k, f));
 
-      const res = await fetch(`/api/applications/${tokenRef.current}/travellers/${idx}`, { method: "PUT", body: fd });
+      let res: Response;
+      try {
+        res = await fetch(`/api/applications/${tokenRef.current}/travellers/${idx}`, { method: "PUT", body: fd });
+      } catch {
+        reportEvent("Connection lost while saving traveller");
+        throw new Error("Connection problem — please check your internet and try again. Your files weren't lost.");
+      }
       const data = await res.json().catch(() => ({}));
       if (!res.ok) {
         const details: Record<string, string[]> = data.details ?? {};
@@ -435,7 +532,12 @@ export default function ApplicationForm({
         setErrs(flat);
         const steps = Object.keys(flat).map((k) => FIELD_STEP[k]).filter(Boolean);
         if (steps.length) setStep(Math.min(...steps));
-        setBanner(data.error ?? "Could not save. Please try again.");
+        setBanner(
+          data.error ??
+            (res.status === 413
+              ? "Your files are too large to upload together. Please compress them (max 5 MB each) and try again."
+              : `We couldn't save this (error ${res.status}). Please try again in a moment.`)
+        );
         setBusy(false);
         return;
       }
@@ -508,7 +610,7 @@ export default function ApplicationForm({
         onChange={(e) => setVal(name, e.target.value)}
         className={`${inputCls} cursor-pointer appearance-none pr-6`}
       >
-        <option value=""></option>
+        <option value="" disabled hidden>Select…</option>
         {options.map((o) => (
           <option key={o} value={o}>
             {o === "yes" ? "Yes" : o === "no" ? "No" : o}
@@ -642,38 +744,50 @@ export default function ApplicationForm({
           )}
 
           {/* STEP 3 — Travel conditions */}
-          {step === 3 && (
-            <fieldset>
-              <legend className="sr-only">Travel conditions</legend>
-              <ul className="grid grid-cols-1 md:grid-cols-2 gap-x-10 gap-y-4 px-2 sm:px-6">
-                {TRAVEL_CONDITIONS.map((c, i) => {
-                  const na = (i === CONDITION_TOURISM && !isTourist) || (i === CONDITION_ADDITIONAL_VISA && !hasOther);
-                  return (
-                    <li key={c}>
-                      <label className={`flex items-start gap-3 text-[15px] ${na ? "opacity-40" : "cursor-pointer"}`}>
-                        <input
-                          type="checkbox"
-                          disabled={na}
-                          checked={na ? false : !!draft.conditions[i]}
-                          onChange={(e) => setCond(i, e.target.checked)}
-                          className="mt-0.5 h-5 w-5 shrink-0 cursor-pointer accent-[#A33132] disabled:cursor-not-allowed"
-                        />
-                        <span>
-                          {c}
-                          {na && <span className="ml-2 text-xs italic">(not applicable to your answers)</span>}
-                        </span>
-                      </label>
-                    </li>
-                  );
-                })}
-              </ul>
-              {err("conditionsAccepted") && (
-                <p role="alert" className="mt-4 px-2 sm:px-6 text-sm font-medium text-red-700">
-                  {err("conditionsAccepted")}
-                </p>
-              )}
-            </fieldset>
-          )}
+          {step === 3 && (() => {
+            const applicable = TRAVEL_CONDITIONS.map((_, i) => !((i === CONDITION_TOURISM && !isTourist) || (i === CONDITION_ADDITIONAL_VISA && !hasOther)));
+            const allChecked = TRAVEL_CONDITIONS.every((_, i) => !applicable[i] || draft.conditions[i]);
+            const toggleAll = (checked: boolean) =>
+              mutate((d) => ({ ...d, conditions: TRAVEL_CONDITIONS.map((_, i) => (applicable[i] ? checked : d.conditions[i])) }));
+            return (
+              <fieldset>
+                <legend className="sr-only">Travel conditions</legend>
+                <label className="mb-5 flex cursor-pointer items-center gap-3 rounded-2xl border border-brand-red/30 bg-[#FFFAEF] px-5 py-4 text-[15px] font-bold text-gray-900">
+                  <input
+                    type="checkbox"
+                    checked={allChecked}
+                    onChange={(e) => toggleAll(e.target.checked)}
+                    className="h-5 w-5 shrink-0 cursor-pointer accent-[#A33132]"
+                  />
+                  I accept all the travel conditions below
+                </label>
+                <ul className="grid grid-cols-1 md:grid-cols-2 gap-x-10 gap-y-3 px-2 sm:px-4">
+                  {TRAVEL_CONDITIONS.map((c, i) => {
+                    if (!applicable[i]) return null;
+                    return (
+                      <li key={c} className="flex items-start gap-3 text-[15px]">
+                        <span className="mt-2 h-2 w-2 shrink-0 rounded-full bg-brand-red" aria-hidden />
+                        <label className="flex flex-1 cursor-pointer items-start gap-3">
+                          <input
+                            type="checkbox"
+                            checked={!!draft.conditions[i]}
+                            onChange={(e) => setCond(i, e.target.checked)}
+                            className="mt-0.5 h-5 w-5 shrink-0 cursor-pointer accent-[#A33132]"
+                          />
+                          <span>{c}</span>
+                        </label>
+                      </li>
+                    );
+                  })}
+                </ul>
+                {err("conditionsAccepted") && (
+                  <p role="alert" className="mt-4 px-2 sm:px-4 text-sm font-medium text-red-700">
+                    {err("conditionsAccepted")}
+                  </p>
+                )}
+              </fieldset>
+            );
+          })()}
 
           {/* STEP 4 — Personal information */}
           {step === 4 && (
@@ -766,12 +880,16 @@ export default function ApplicationForm({
                 {fileCard("eVisa", "UK e-Visa (Upload e-visa)", false, "Your UK e-visa / immigration status document, if you have one.", "PDF, JPG, PNG")}
               </div>
               <div className="mt-6 grid grid-cols-1 gap-x-4 gap-y-3 sm:grid-cols-2">
-                <Field label="Processing Speed" help="Applies to the whole application. Standard takes 3–5 working days; Urgent is next working day">
+                <div className="flex flex-col justify-center rounded-2xl border border-brand-red/60 bg-[#FFF8F8] px-4 py-2.5 ring-1 ring-brand-red/10">
+                  <label htmlFor="processing-speed" className="mb-1 text-[11px] font-bold uppercase tracking-widest text-brand-red">
+                    Processing speed <span aria-hidden>*</span>
+                  </label>
                   <div className="relative">
                     <select
+                      id="processing-speed"
                       value={enq.processing}
                       onChange={(e) => setEnq({ ...enq, processing: e.target.value as ProcessingValue })}
-                      className={`${inputCls} cursor-pointer appearance-none pr-6`}
+                      className="w-full cursor-pointer appearance-none bg-transparent pr-6 font-[inherit] text-[15px] font-semibold text-gray-900 outline-none"
                     >
                       {PROCESSING_OPTIONS.map((o) => (
                         <option key={o.value} value={o.value}>
@@ -781,13 +899,15 @@ export default function ApplicationForm({
                     </select>
                     {chevron}
                   </div>
-                </Field>
-                <div className="flex flex-col justify-center rounded-[1.25rem] border border-gray-100 bg-[#FFFAEF] p-4">
-                  <span className="text-[11px] font-bold uppercase tracking-widest text-gray-800">Total to pay</span>
-                  <span className="font-playfair text-3xl text-gray-900">£{total}</span>
-                  <span className="text-xs text-gray-500">
-                    {N} {N === 1 ? "traveller" : "travellers"} × £{amountPenceFor(enq.processing, 1) / 100}
-                  </span>
+                </div>
+                <div className="flex items-center justify-between gap-4 rounded-2xl bg-[#5E1A1A] px-6 py-4 text-white shadow-lg">
+                  <div>
+                    <span className="block text-[11px] font-bold uppercase tracking-[0.2em] text-white/70">Total to pay</span>
+                    <span className="mt-1 block text-xs text-white/70">
+                      {N} {N === 1 ? "traveller" : "travellers"} × £{amountPenceFor(enq.processing, 1) / 100}
+                    </span>
+                  </div>
+                  <span className="font-playfair text-5xl leading-none">£{total}</span>
                 </div>
               </div>
               <p className="mt-5 text-sm text-gray-600">
@@ -851,7 +971,7 @@ export default function ApplicationForm({
                   disabled={busy}
                   className="rounded-full bg-brand-red px-10 py-3.5 text-[13px] font-bold uppercase tracking-widest text-white shadow-lg transition hover:bg-[#8A2728] disabled:opacity-60"
                 >
-                  {busy ? "Please wait…" : idx < N ? "Save & next traveller" : `Save & pay £${total}`}
+                  {busy ? "Please wait…" : idx < N ? "Save & next traveller" : "Proceed to payment"}
                 </button>
               </div>
             )}

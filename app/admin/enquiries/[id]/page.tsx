@@ -16,6 +16,41 @@ function Row({ label, value }: { label: string; value: string }) {
   );
 }
 
+const DRAFT_FIELDS: [string, string][] = [
+  ["nationality", "Nationality"],
+  ["countryOfResidence", "Country of residence"],
+  ["dateOfBirth", "Date of birth"],
+  ["documentType", "Document type"],
+  ["purposeOfTrip", "Purpose of trip"],
+  ["hasOtherVisa", "Other valid visa"],
+  ["familyName", "Family name"],
+  ["firstName", "First name"],
+  ["placeOfBirth", "Place of birth"],
+  ["phone", "Mobile"],
+  ["email", "Email"],
+  ["occupation", "Occupation"],
+  ["passportNumber", "Passport number"],
+  ["issuedBy", "Issued by"],
+  ["dateOfIssue", "Date of issue"],
+  ["expiryDate", "Expiry date"],
+  ["additionalVisaType", "Additional visa"],
+  ["additionalVisaFrom", "Additional visa valid from"],
+  ["additionalVisaUntil", "Additional visa valid until"],
+  ["additionalVisaEntries", "Additional visa entries"],
+  ["additionalVisaNumber", "Additional visa number"],
+  ["arrivalDate", "Arrival in Morocco"],
+  ["departureDate", "Departure from Morocco"],
+  ["ukShareCode", "UK immigration status code"],
+  ["conditionsAccepted", "Travel conditions accepted"],
+];
+
+function draftValue(key: string, values: Record<string, string>) {
+  if (key === "phone") return values.phone ? `${values._dial ?? ""} ${values.phone}`.trim() : "—";
+  if (key === "hasOtherVisa") return values.hasOtherVisa === "yes" ? "Yes" : values.hasOtherVisa === "no" ? "No" : "—";
+  if (key === "conditionsAccepted") return values.conditionsAccepted === "true" ? "Yes" : "Not yet";
+  return values[key] || "—";
+}
+
 export default async function EnquiryDetailPage({ params }: { params: Promise<{ id: string }> }) {
   await verifySession();
   const { id } = await params;
@@ -24,6 +59,12 @@ export default async function EnquiryDetailPage({ params }: { params: Promise<{ 
     include: { travellerDetails: { orderBy: { position: "asc" } } },
   });
   if (!enquiry) notFound();
+
+  // Autosaved answers for travellers that were never submitted.
+  const savedPositions = new Set(enquiry.travellerDetails.map((t) => t.position));
+  const drafts = Object.entries((enquiry.draft as Record<string, Record<string, string>> | null) ?? {})
+    .filter(([pos]) => !savedPositions.has(Number(pos)))
+    .sort((a, b) => Number(a[0]) - Number(b[0]));
 
   const payStyle =
     enquiry.paymentStatus === "paid" ? "bg-green-100 text-green-700" : enquiry.paymentStatus === "refunded" ? "bg-gray-200 text-gray-700" : "bg-amber-100 text-amber-700";
@@ -53,6 +94,8 @@ export default async function EnquiryDetailPage({ params }: { params: Promise<{ 
             <Row label="Travellers" value={String(enquiry.travellers)} />
             <Row label="Source" value={enquiry.source} />
             <Row label="Submitted" value={fmtDate(enquiry.createdAt, true)} />
+            {enquiry.abandonedAt && <Row label="Abandoned" value={`${fmtDate(enquiry.abandonedAt, true)} — ${enquiry.abandonReason ?? ""}`} />}
+            {enquiry.lastError && <Row label="Last error" value={enquiry.lastError} />}
             <Row label="Paid on" value={enquiry.paidAt ? fmtDate(enquiry.paidAt, true) : "—"} />
             <Row label="Status" value={enquiry.status} />
             <Row
@@ -66,9 +109,30 @@ export default async function EnquiryDetailPage({ params }: { params: Promise<{ 
           </dl>
         </section>
 
-        {enquiry.travellerDetails.length === 0 && (
-          <p className="text-gray-500 text-center py-10">The customer hasn&apos;t entered passport details yet.</p>
+        {enquiry.travellerDetails.length === 0 && drafts.length === 0 && (
+          <p className="text-gray-500 text-center py-10">The customer hasn&apos;t entered any traveller details yet. Only their contact email is known.</p>
         )}
+
+        {drafts.map(([position, values]) => (
+          <section key={`draft-${position}`} className="bg-white rounded-[1.5rem] border-2 border-dashed border-amber-300 p-6 lg:p-8 mb-6">
+            <div className="flex flex-wrap items-center justify-between gap-3 mb-5 pb-4 border-b border-gray-100">
+              <h2 className="font-playfair text-2xl text-gray-900">
+                Traveller {position}: {[values.firstName, values.familyName].filter(Boolean).join(" ") || "name not entered yet"}
+              </h2>
+              <span className="rounded-full bg-amber-100 px-4 py-1.5 text-xs font-bold uppercase tracking-wider text-amber-800">
+                In progress — not submitted
+              </span>
+            </div>
+            <p className="mb-5 text-sm text-gray-500">
+              Auto-saved from the customer&apos;s form. They never pressed the final button for this traveller, so no documents were uploaded and some fields may be blank.
+            </p>
+            <dl className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+              {DRAFT_FIELDS.map(([key, label]) => (
+                <Row key={key} label={label} value={draftValue(key, values)} />
+              ))}
+            </dl>
+          </section>
+        ))}
 
         {enquiry.travellerDetails.map((t) => (
           <section key={t.id} className="bg-white rounded-[1.5rem] shadow-[0_20px_60px_rgb(0,0,0,0.04)] p-6 lg:p-8 mb-6">

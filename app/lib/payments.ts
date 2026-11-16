@@ -1,5 +1,6 @@
 import "server-only";
 import type Stripe from "stripe";
+import { Prisma } from "@prisma/client";
 import type { Enquiry } from "@prisma/client";
 import { prisma } from "@/app/lib/prisma";
 import { getStripe } from "@/app/lib/stripe";
@@ -82,7 +83,15 @@ export async function markPaidFromSession(session: Stripe.Checkout.Session): Pro
   const paidAt = new Date();
   const { count } = await prisma.enquiry.updateMany({
     where: { id: enquiry.id, paymentStatus: "unpaid" },
-    data: { paymentStatus: "paid", paidAt, stripeSessionId: session.id, stripePaymentIntentId: paymentIntentId },
+    data: {
+      paymentStatus: "paid",
+      paidAt,
+      stripeSessionId: session.id,
+      stripePaymentIntentId: paymentIntentId,
+      abandonedAt: null,
+      abandonReason: null,
+      draft: Prisma.DbNull,
+    },
   });
   if (count === 1) {
     try {

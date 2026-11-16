@@ -2,6 +2,7 @@ import { NextResponse, after } from "next/server";
 import { prisma } from "@/app/lib/prisma";
 import { AlreadyPaidError, createCheckoutUrl } from "@/app/lib/payments";
 import { rateLimit } from "@/app/lib/rateLimit";
+import { recordFailure } from "@/app/lib/leads";
 import { sendApplicationSubmitted } from "@/app/lib/email";
 
 type Ctx = { params: Promise<{ token: string }> };
@@ -50,6 +51,7 @@ export async function POST(request: Request, { params }: Ctx) {
       return NextResponse.json({ error: "This application has already been paid." }, { status: 409 });
     }
     console.error("Checkout creation failed", err);
+    await recordFailure({ id: enquiry.id }, "Could not open payment page", err instanceof Error ? err.message : String(err));
     return NextResponse.json(
       { error: "Your details are saved, but we couldn't open the payment page. Please try again." },
       { status: 502 }

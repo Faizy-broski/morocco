@@ -41,12 +41,20 @@ model Enquiry {
   paidAt        DateTime?
   accessToken   String        @unique
   detailsCompletedAt DateTime?
+  abandonedAt        DateTime?
+  abandonReason      String?
+  lastError          String?
+  lastErrorAt        DateTime?
+  failureAlertAt     DateTime?
+  reminderSentAt     DateTime?
+  draft              Json?
   travellerDetails   Traveller[]
   createdAt     DateTime      @default(now())
   updatedAt     DateTime      @updatedAt
 
   @@index([status])
   @@index([paymentStatus])
+  @@index([abandonedAt])
   @@index([stripePaymentIntentId])
   @@index([createdAt])
 }

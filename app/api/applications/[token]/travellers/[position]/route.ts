@@ -2,7 +2,9 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/app/lib/prisma";
 import { travellerSchema, TRAVELLER_FIELDS } from "@/app/lib/applicationFields";
 import { saveUpload, deleteUpload, UploadError } from "@/app/lib/uploads";
+import { Prisma } from "@prisma/client";
 import { rateLimit } from "@/app/lib/rateLimit";
+import { recordFailure } from "@/app/lib/leads";
 import { visaTypeFor } from "@/app/lib/constants";
 
 type Ctx = { params: Promise<{ token: string; position: string }> };
@@ -13,7 +15,7 @@ const fileOf = (form: FormData, name: string) => {
 };
 
 /** Save one traveller's full application. Re-saving replaces the previous entry. */
-export async function PUT(request: Request, { params }: Ctx) {
+async function save(request: Request, { params }: Ctx) {
   if (!rateLimit(request, "traveller-save", 60)) {
     return NextResponse.json({ error: "Too many requests. Please try again shortly." }, { status: 429 });
   }
@@ -125,6 +127,14 @@ export async function PUT(request: Request, { params }: Ctx) {
       });
     }
 
+    // The submitted record replaces the autosaved draft for this traveller.
+    const draft = (enquiry.draft as Record<string, unknown> | null) ?? null;
+    if (draft && String(position) in draft) {
+      const { [String(position)]: _gone, ...rest } = draft;
+      void _gone;
+      await prisma.enquiry.update({ where: { id: enquiry.id }, data: { draft: Object.keys(rest).length ? (rest as object) : Prisma.DbNull } });
+    }
+
     // Replaced / no-longer-needed files are removed only after the record is safely stored.
     if (existing) {
       if (photo) await deleteUpload(existing.photoPath);
@@ -140,10 +150,23 @@ export async function PUT(request: Request, { params }: Ctx) {
   } catch (err) {
     for (const p of newPaths) await deleteUpload(p);
     if (err instanceof UploadError) {
-      const kind = err.message.includes("photo") ? "photo" : "passport";
-      return NextResponse.json({ error: err.message, details: { [kind]: [err.message] } }, { status: 400 });
+      // The customer can fix this themselves; remember it only as a note, not an alert.
+      return NextResponse.json({ error: err.message, details: { [err.field ?? "passport"]: [err.message] } }, { status: 400 });
     }
     console.error("Failed to save traveller", err);
+    await recordFailure({ token }, "Saving traveller failed", err instanceof Error ? err.message : String(err));
     return NextResponse.json({ error: "Could not save these details. Please try again." }, { status: 500 });
+  }
+}
+
+export async function PUT(request: Request, ctx: Ctx) {
+  try {
+    return await save(request, ctx);
+  } catch (err) {
+    // Anything unexpected (e.g. database hiccup) still returns JSON so the form can show a useful message.
+    console.error("Traveller save crashed", err);
+    const { token } = await ctx.params;
+    await recordFailure({ token }, "Saving traveller crashed", err instanceof Error ? err.message : String(err));
+    return NextResponse.json({ error: "Our server had a problem saving this. Please try again in a moment." }, { status: 500 });
   }
 }

@@ -17,5 +17,6 @@ export async function GET(_request: Request, { params }: Ctx) {
   return NextResponse.json({
     enquiry: { email: enquiry.email, processing: enquiry.processing, travellers: enquiry.travellers },
     saved: toSavedTravellers(enquiry.travellerDetails),
+    drafts: enquiry.draft ?? {},
   });
 }
