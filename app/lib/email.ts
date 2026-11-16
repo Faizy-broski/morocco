@@ -192,6 +192,34 @@ export async function sendApplicationSubmitted(enquiry: Enquiry, travellers: Tra
   logFailures(results);
 }
 
+/** Customer, instantly when they submit all details: confirms receipt and gives the link to pay. */
+export async function sendApplicationReceived(enquiry: Enquiry, travellers: Traveller[]) {
+  const transporter = getTransporter();
+  if (!transporter) return;
+  const name = travellers[0]?.firstName;
+  await transporter.sendMail({
+    from: FROM,
+    to: enquiry.email,
+    replyTo: BUSINESS_EMAIL,
+    subject: `We've received your application — ${enquiry.trackingCode}`,
+    html: layout({
+      preheader: "Your details are saved. Complete payment to start processing.",
+      heading: name ? `Thank you, ${esc(name)}` : "Thank you",
+      intro: "We've received your Morocco visa application details. Your application starts processing as soon as payment is complete.",
+      body: `
+        <p style="margin:0 0 18px">${pill("Awaiting payment", "#fef3c7", "#92400e")}</p>
+        ${codeBox(enquiry.trackingCode)}
+        ${rows([
+          ["Travellers", travellerList(travellers)],
+          ["Processing", esc(processingText(enquiry.processing))],
+          ["Total to pay", gbp(enquiry.amountPence)],
+        ])}
+        <p style="margin:24px 0 0;text-align:center">${button(`${SITE_URL}/apply/${enquiry.accessToken}`, "Complete payment")}</p>
+        <p style="margin:22px 0 0;font-size:13px;color:${MUTED};text-align:center">Already paid? You'll get a separate confirmation email. Need help? Reply here or call ${PHONE}.</p>`,
+    }),
+  });
+}
+
 /** Customer booking confirmation + admin "paid" alert, sent once when Stripe confirms payment. */
 export async function sendPaymentConfirmation(enquiry: Enquiry, travellers: Traveller[]) {
   const transporter = getTransporter();
@@ -338,7 +366,7 @@ export async function sendAbandonedDigest(items: { enquiry: Enquiry; travellers:
         admin: true,
         preheader: `${items.length} customers started an application but haven't paid.`,
         heading: `${items.length} potential lead${items.length === 1 ? "" : "s"} to follow up`,
-        intro: "These customers started an application but haven't paid. We've also sent each of them a reminder with their link.",
+        intro: "These customers started an application but haven't paid. Open any of them to see what they entered and send them their link.",
         body: `<table role="presentation" width="100%" cellpadding="0" cellspacing="0">${list}</table>
           <p style="margin:26px 0 0;text-align:center">${button(`${SITE_URL}/admin?tab=abandoned`, "Open Abandoned tab")}</p>`,
       }),
@@ -347,10 +375,10 @@ export async function sendAbandonedDigest(items: { enquiry: Enquiry; travellers:
   logFailures(results);
 }
 
-/** Customer: one gentle reminder to finish and pay. */
+/** Customer: a reminder with their private link to finish and pay. Sent only when an admin presses the button. */
 export async function sendPaymentReminder(enquiry: Enquiry, travellers: Traveller[]) {
   const transporter = getTransporter();
-  if (!transporter) return;
+  if (!transporter) throw new Error("SMTP is not configured");
   const name = travellers[0]?.firstName;
   await transporter.sendMail({
     from: FROM,

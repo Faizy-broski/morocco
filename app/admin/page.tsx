@@ -5,6 +5,7 @@ import { VISA_TYPES } from "@/app/lib/constants";
 import StatusSelect from "./StatusSelect";
 import RefreshButton from "./RefreshButton";
 import DeleteButton from "./DeleteButton";
+import ReminderButton from "./ReminderButton";
 
 const PAGE_SIZE = 20;
 
@@ -283,11 +284,9 @@ export default async function AdminPage({
                         <span className="text-gray-500">
                           {enquiry.travellerDetails.length}/{enquiry.travellers} saved
                         </span>
-                        <a href={`mailto:${enquiry.email}?subject=Your Morocco visa application ${enquiry.trackingCode}`} className="font-semibold text-brand-red hover:underline">
-                          Email →
-                        </a>
                       </div>
                     )}
+                    {enquiry.paymentStatus === "unpaid" && <ReminderButton id={enquiry.id} sentAt={enquiry.reminderSentAt?.toISOString() ?? null} />}
                   </div>
 
                   <div className="text-sm space-y-1">

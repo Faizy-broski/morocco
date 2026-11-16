@@ -3,7 +3,7 @@ import { prisma } from "@/app/lib/prisma";
 import { AlreadyPaidError, createCheckoutUrl } from "@/app/lib/payments";
 import { rateLimit } from "@/app/lib/rateLimit";
 import { recordFailure } from "@/app/lib/leads";
-import { sendApplicationSubmitted } from "@/app/lib/email";
+import { sendApplicationSubmitted, sendApplicationReceived } from "@/app/lib/email";
 
 type Ctx = { params: Promise<{ token: string }> };
 
@@ -39,7 +39,10 @@ export async function POST(request: Request, { params }: Ctx) {
   if (firstTime) {
     const travellers = enquiry.travellerDetails;
     after(async () => {
-      await sendApplicationSubmitted(completed, travellers).catch((err) => console.error("Admin notification failed", err));
+      await Promise.all([
+        sendApplicationSubmitted(completed, travellers).catch((err) => console.error("Admin notification failed", err)),
+        sendApplicationReceived(completed, travellers).catch((err) => console.error("Customer receipt email failed", err)),
+      ]);
     });
   }
 
